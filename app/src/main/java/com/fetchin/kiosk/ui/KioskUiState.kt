@@ -4,9 +4,9 @@ sealed interface KioskUiState {
     data object Initializing : KioskUiState
     data object Loading : KioskUiState
     data object WebContent : KioskUiState
-    data object Offline : KioskUiState
-    data object LoadError : KioskUiState
+    data class Offline(val detail: String) : KioskUiState
+    data class LoadError(val detail: String) : KioskUiState
     data object BlockedNavigation : KioskUiState
-    data object NotProvisioned : KioskUiState
+    data class NotProvisioned(val detail: String) : KioskUiState
     data object Maintenance : KioskUiState
 }

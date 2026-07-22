@@ -33,8 +33,8 @@ Each task must end with validation and documentation updates. Status values: pen
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | KIOSK-030 | Implement DeviceAdminReceiver | `admin` | Manifest | Receiver registered | Manual/ADB | Confusing admin vs owner | completed initial |
 | KIOSK-031 | Configure Lock Task packages | `KioskController` | Device Owner | App allowlisted | Device test | Requires factory reset | pending |
-| KIOSK-032 | Show provisioning status | `kiosk`, `ui` | DevicePolicyManager | Clear state shown | Manual | False security | pending |
-| KIOSK-033 | Add development fallback messaging | `ui` | None | Debug clearly weaker | Manual | Misused in prod | pending |
+| KIOSK-032 | Show provisioning status | `kiosk`, `ui` | DevicePolicyManager | Device Owner and Lock Task permission are visible when not provisioned | Unit/build validated | Needs real-device validation | completed initial |
+| KIOSK-033 | Add development fallback messaging | `ui` | None | Debug fallback banner clearly says kiosk security is inactive | Unit/build validated | Must not ship as production assurance | completed initial |
 
 ## Phase 4: Administrative Access
 
@@ -49,8 +49,8 @@ Each task must end with validation and documentation updates. Status values: pen
 
 | Task | Objective | Files | Dependencies | Done | Tests | Risks | Status |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| KIOSK-050 | Connectivity observer | `util`, `ui` | ConnectivityManager | Offline state accurate | Unit/manual | Captive portals | pending |
-| KIOSK-051 | WebView error handling | `web`, `ui` | WebViewClient callbacks | Custom errors | Instrumented | Blank WebView | pending |
+| KIOSK-050 | Connectivity observer | `util`, `ui` | ConnectivityManager | Offline state checks validated internet before loading/retry | Build/lint validated | Captive portals may appear offline by design | completed initial |
+| KIOSK-051 | WebView error handling | `web`, `ui` | WebViewClient callbacks | Main-frame network, HTTP, and TLS errors show custom error state | Build/lint validated | Needs instrumented WebView tests | completed initial |
 | KIOSK-052 | Renderer crash recovery | `web` | API support | WebView can recover | Manual | Data loss | pending |
 | KIOSK-053 | Minimal persistence | `config` | DataStore if needed | Config survives reboot | Unit/manual | Local tampering | pending |
 

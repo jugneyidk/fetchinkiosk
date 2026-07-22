@@ -3,9 +3,9 @@
 | Field | Value |
 | --- | --- |
 | Updated | 2026-07-22 |
-| Stage | Secure WebView navigation implementation started |
-| Last change | Completed KIOSK-021 secure navigation blocking, blocked navigation state, and download blocking skeleton |
-| Next task | Implement Phase 3 provisioning status UI or Phase 5 connectivity/error recovery |
+| Stage | Connectivity and WebView error handling implementation started |
+| Last change | Completed initial KIOSK-050/KIOSK-051 connectivity checks, retry behavior, and main-frame WebView error handling |
+| Next task | Implement KIOSK-052 WebView renderer crash recovery or KIOSK-040 admin gesture flow |
 | Build status | Passing: `assembleDebug` |
 | Test status | Passing: `testDebugUnitTest`, 13 tests |
 | Lint status | Passing: `lintDebug` |
@@ -17,9 +17,9 @@
 | Phase 0 Preparation | 100% |
 | Phase 1 Shell Visual | 35% |
 | Phase 2 Secure WebView | 70% |
-| Phase 3 Kiosk Control | 20% |
+| Phase 3 Kiosk Control | 55% |
 | Phase 4 Admin Access | 10% |
-| Phase 5 Resilience | 0% |
+| Phase 5 Resilience | 45% |
 | Phase 6 Provisioning | 20% |
 | Phase 7 Tests And Hardening | 10% |
 
@@ -29,7 +29,7 @@
 | --- | --- |
 | OS | Windows 10.0.19045 |
 | JDK | Temurin OpenJDK 17.0.19 |
-| Git repository | Not initialized |
+| Git repository | Initialized; worktree clean before KIOSK-032 changes |
 | Global Gradle | Not installed |
 | Gradle wrapper | 9.6.1 |
 | Android Gradle Plugin | 9.2.1 |
@@ -40,9 +40,9 @@
 
 ## Commands Passing
 
-- `.\gradlew.bat testDebugUnitTest --console=plain` passed in 6s after one expected test correction.
-- `.\gradlew.bat assembleDebug --console=plain` passed in 10s.
-- `.\gradlew.bat lintDebug --console=plain` passed in 50s.
+- `.\gradlew.bat testDebugUnitTest --console=plain` passed in 5s after KIOSK-050/KIOSK-051 changes.
+- `.\gradlew.bat assembleDebug --console=plain` passed in 3s after KIOSK-050/KIOSK-051 changes.
+- `.\gradlew.bat lintDebug --console=plain` passed in 13s after KIOSK-050/KIOSK-051 changes.
 - `UrlPolicyTest` ran 13 tests, 0 failures, 0 errors.
 
 ## Commands Failing
@@ -63,6 +63,8 @@
 - Device Owner behavior varies by OS/OEM.
 - Admin PIN strategy is not selected.
 - Real production hosts may need additional allowlist entries for subresources if the web system loads assets from dedicated domains.
+- Connectivity uses Android validated internet capability, so captive portals and networks without validation are treated as offline.
+- Main-frame WebView errors are handled, but renderer crash recovery still belongs to KIOSK-052.
 
 ## Local Repair Notes
 

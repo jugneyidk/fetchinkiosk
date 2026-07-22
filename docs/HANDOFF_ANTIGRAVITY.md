@@ -16,6 +16,10 @@ Fetchin Kiosk is a native Android kiosk shell for tablets. It loads one authoriz
 - WebView settings are hardened at skeleton level.
 - WebView top-level navigation and subresources are routed through `UrlPolicy`.
 - Download attempts trigger blocked navigation state instead of downloading.
+- Provisioning status is visible when Lock Task is not permitted.
+- Debug builds show a visible weaker-security fallback banner instead of silently pretending to be production kiosk mode.
+- Connectivity is checked before initial load and retry using Android validated internet capability.
+- Main-frame WebView network, HTTP, and TLS errors show custom error states.
 - Device admin receiver exists.
 - Kiosk controller can attempt Lock Task only when permitted.
 - Admin PIN is interface only.
@@ -39,9 +43,9 @@ Fetchin Kiosk is a native Android kiosk shell for tablets. It loads one authoriz
 - Secure PIN verification.
 - Admin maintenance UI.
 - DevicePolicyManager lock task package allowlisting.
-- Device owner status rendering.
+- Real-device Device Owner and Lock Task validation.
 - Connectivity observer.
-- Full WebView network/load error handling.
+- WebView renderer crash recovery.
 - Renderer crash recovery.
 - DataStore or managed config.
 - Instrumented tests.
@@ -60,8 +64,9 @@ Fetchin Kiosk is a native Android kiosk shell for tablets. It loads one authoriz
 ## Required Implementation Order
 
 1. Fix any build/lint failures recorded in `PROJECT_STATUS.md`.
-2. Add provisioning status UI for `KIOSK-032`.
-3. Implement connectivity/error handling for `KIOSK-050` and `KIOSK-051`.
+2. Implement WebView renderer crash recovery for `KIOSK-052`.
+3. Implement admin gesture and PIN boundary for `KIOSK-040`/`KIOSK-041`.
+4. Validate Device Owner and Lock Task behavior on real hardware for `KIOSK-061` when a tablet is available.
 5. Implement admin gesture plus secure PIN design for `KIOSK-040` and `KIOSK-041`.
 6. Implement Lock Task package setup for Device Owner devices.
 7. Add instrumented tests and manual validation notes.

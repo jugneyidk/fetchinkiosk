@@ -3,4 +3,6 @@
     <color name="kiosk_background">#101820</color>
     <color name="kiosk_on_background">#F5F7FA</color>
     <color name="kiosk_primary">#00A6A6</color>
+    <color name="kiosk_warning">#B00020</color>
+    <color name="kiosk_on_warning">#FFFFFF</color>
 </resources>

@@ -11,6 +11,17 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
+    <TextView
+        android:id="@+id/provisioningBanner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/kiosk_warning"
+        android:padding="12dp"
+        android:textColor="@color/kiosk_on_warning"
+        android:textSize="14sp"
+        android:visibility="gone"
+        tools:text="Development fallback" />
+
     <LinearLayout
         android:id="@+id/statusPanel"
         android:layout_width="match_parent"
@@ -34,6 +45,17 @@
             android:text="@string/state_initializing"
             android:textColor="@color/kiosk_on_background"
             android:textSize="22sp" />
+
+        <TextView
+            android:id="@+id/statusMessage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:gravity="center"
+            android:textColor="@color/kiosk_on_background"
+            android:textSize="16sp"
+            android:visibility="gone"
+            tools:text="Provisioning details" />
 
         <Button
             android:id="@+id/retryButton"

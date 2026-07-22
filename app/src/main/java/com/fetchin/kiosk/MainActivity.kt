@@ -9,7 +9,11 @@ import com.fetchin.kiosk.admin.AdminAccessController
 import com.fetchin.kiosk.config.AppConfig
 import com.fetchin.kiosk.databinding.ActivityMainBinding
 import com.fetchin.kiosk.kiosk.KioskController
+import com.fetchin.kiosk.kiosk.KioskProvisioningStatus
+import com.fetchin.kiosk.kiosk.KioskStartResult
 import com.fetchin.kiosk.ui.KioskUiState
+import com.fetchin.kiosk.util.AndroidConnectivityObserver
+import com.fetchin.kiosk.util.ConnectivityObserver
 import com.fetchin.kiosk.web.SecureWebViewClient
 import com.fetchin.kiosk.web.WebViewConfigurator
 
@@ -17,6 +21,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var config: AppConfig
     private lateinit var kioskController: KioskController
+    private lateinit var connectivityObserver: ConnectivityObserver
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -25,14 +30,13 @@ class MainActivity : AppCompatActivity() {
 
         config = AppConfig.default()
         kioskController = KioskController(this)
+        connectivityObserver = AndroidConnectivityObserver(this)
         AdminAccessController(config.adminGestureTapCount, config.adminGestureWindowMillis)
 
         applyScreenPolicy()
         configureBackBehavior()
         configureWebView()
-        render(KioskUiState.Loading)
-        binding.kioskWebView.loadUrl(config.startUrl)
-        kioskController.startLockTaskIfAllowed()
+        handleKioskStart(kioskController.startLockTaskIfAllowed())
     }
 
     override fun onResume() {
@@ -82,9 +86,40 @@ class MainActivity : AppCompatActivity() {
             render(KioskUiState.BlockedNavigation)
         }
         binding.retryButton.setOnClickListener {
-            render(KioskUiState.Loading)
-            binding.kioskWebView.reload()
+            loadConfiguredSystem()
         }
+    }
+
+    private fun handleKioskStart(result: KioskStartResult) {
+        when (result) {
+            is KioskStartResult.Started -> {
+                binding.provisioningBanner.visibility = View.GONE
+                loadConfiguredSystem()
+            }
+            is KioskStartResult.NotPermitted -> handleUnprovisioned(result.status)
+            is KioskStartResult.Failed -> handleUnprovisioned(result.status)
+        }
+    }
+
+    private fun handleUnprovisioned(status: KioskProvisioningStatus) {
+        val detail = provisioningDetail(status)
+        if (BuildConfig.DEBUG) {
+            binding.provisioningBanner.text = getString(R.string.development_fallback_warning, detail)
+            binding.provisioningBanner.visibility = View.VISIBLE
+            loadConfiguredSystem()
+        } else {
+            binding.provisioningBanner.visibility = View.GONE
+            render(KioskUiState.NotProvisioned(detail))
+        }
+    }
+
+    private fun loadConfiguredSystem() {
+        if (!connectivityObserver.isOnline()) {
+            render(KioskUiState.Offline(getString(R.string.state_offline_detail)))
+            return
+        }
+        render(KioskUiState.Loading)
+        binding.kioskWebView.loadUrl(config.startUrl)
     }
 
     private fun render(state: KioskUiState) {
@@ -92,19 +127,46 @@ class MainActivity : AppCompatActivity() {
             KioskUiState.WebContent -> View.GONE
             else -> View.VISIBLE
         }
+        binding.statusProgress.visibility = when (state) {
+            KioskUiState.Initializing, KioskUiState.Loading -> View.VISIBLE
+            else -> View.GONE
+        }
         binding.statusTitle.text = when (state) {
             KioskUiState.Initializing -> getString(R.string.state_initializing)
             KioskUiState.Loading -> getString(R.string.state_loading)
             KioskUiState.WebContent -> ""
-            KioskUiState.Offline -> getString(R.string.state_offline)
-            KioskUiState.LoadError -> getString(R.string.state_load_error)
+            is KioskUiState.Offline -> getString(R.string.state_offline)
+            is KioskUiState.LoadError -> getString(R.string.state_load_error)
             KioskUiState.BlockedNavigation -> getString(R.string.state_blocked_navigation)
-            KioskUiState.NotProvisioned -> getString(R.string.state_not_provisioned)
+            is KioskUiState.NotProvisioned -> getString(R.string.state_not_provisioned)
             KioskUiState.Maintenance -> getString(R.string.state_maintenance)
         }
-        binding.retryButton.visibility = when (state) {
-            KioskUiState.Offline, KioskUiState.LoadError, KioskUiState.BlockedNavigation -> View.VISIBLE
+        binding.statusMessage.text = when (state) {
+            is KioskUiState.Offline -> state.detail
+            is KioskUiState.LoadError -> state.detail.ifBlank { getString(R.string.state_load_error_detail) }
+            is KioskUiState.NotProvisioned -> state.detail
+            else -> ""
+        }
+        binding.statusMessage.visibility = when (state) {
+            is KioskUiState.Offline, is KioskUiState.LoadError, is KioskUiState.NotProvisioned -> View.VISIBLE
             else -> View.GONE
         }
+        binding.retryButton.visibility = when (state) {
+            is KioskUiState.Offline, is KioskUiState.LoadError, KioskUiState.BlockedNavigation -> View.VISIBLE
+            else -> View.GONE
+        }
+    }
+
+    private fun provisioningDetail(status: KioskProvisioningStatus): String {
+        return getString(
+            R.string.provisioning_detail,
+            status.packageName,
+            yesNo(status.isDeviceOwner),
+            yesNo(status.isLockTaskPermitted)
+        )
+    }
+
+    private fun yesNo(value: Boolean): String {
+        return if (value) getString(R.string.value_yes) else getString(R.string.value_no)
     }
 }

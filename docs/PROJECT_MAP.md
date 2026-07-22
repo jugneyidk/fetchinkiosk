@@ -85,13 +85,15 @@ This file is the navigable map for Fetchin Kiosk. Keep it synchronized with real
 | `UrlPolicy` | Implemented | Validates HTTPS and allowlisted host boundaries, returning allow/block reasons. |
 | `WebViewConfigurator` | Skeleton | Applies initial secure WebView settings. |
 | `SecureWebViewClient` | Implemented initial | Blocks disallowed top-level navigation and returns 403 for disallowed subresources. |
-| `KioskController` | Skeleton | Starts/stops Lock Task when permitted. |
+| `KioskController` | Implemented initial | Starts/stops Lock Task when permitted and exposes provisioning status. |
+| `KioskProvisioningStatus` | Implemented initial | Carries Device Owner, Lock Task permission, and package state for UI decisions. |
 | `DeviceOwnerStatusProvider` | Skeleton | Reads Device Owner and Lock Task status. |
 | `KioskDeviceAdminReceiver` | Skeleton | Device admin receiver for provisioning. |
 | `AdminAccessController` | Skeleton | Tracks hidden gesture. |
 | `AdminPinVerifier` | Interface | Defines future PIN verification boundary. |
 | `KioskUiState` | Skeleton | Represents visual states. |
-| `ConnectivityObserver` | Interface | Future connectivity abstraction. |
+| `ConnectivityObserver` | Interface | Connectivity abstraction used before load/retry. |
+| `AndroidConnectivityObserver` | Implemented initial | Checks Android validated internet capability. |
 | `KioskLogger` | Skeleton | Future safe admin event logging boundary. |
 
 ## Startup Flow
@@ -121,7 +123,7 @@ Start URL -> WebView -> SecureWebViewClient -> UrlPolicy -> allow HTTPS allowlis
 ## Kiosk Entry Flow
 
 ```text
-MainActivity -> KioskController -> DevicePolicyManager.isLockTaskPermitted -> startLockTask when allowed -> show not-provisioned path when not allowed
+MainActivity -> KioskController -> DevicePolicyManager status -> startLockTask when allowed -> release blocks on not-provisioned -> debug loads with visible weaker fallback banner
 ```
 
 ## Admin Exit Flow
@@ -137,7 +139,7 @@ Hidden gesture -> PIN dialog -> AdminPinVerifier -> maintenance unlock timer -> 
 Planned:
 
 ```text
-WebView error or offline -> custom error state -> retry button -> connectivity check -> reload or rebuild WebView if needed
+Offline before load/retry -> offline state -> retry rechecks network -> WebView main-frame network/HTTP/TLS error -> load error state -> retry loads configured start URL
 ```
 
 ## Dependency Direction

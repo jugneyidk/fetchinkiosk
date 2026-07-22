@@ -1,8 +1,11 @@
 package com.fetchin.kiosk.web
 
 import android.graphics.Bitmap
+import android.net.http.SslError
+import android.webkit.SslErrorHandler
 import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
+import android.webkit.WebResourceError
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import com.fetchin.kiosk.ui.KioskUiState
@@ -12,6 +15,8 @@ class SecureWebViewClient(
     private val urlPolicy: UrlPolicy,
     private val onStateChanged: (KioskUiState) -> Unit
 ) : WebViewClient() {
+    private var mainFrameFailed = false
+
     override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
         val decision = urlPolicy.evaluate(request.url.toString())
         if (decision is UrlPolicyDecision.Blocked) {
@@ -28,7 +33,9 @@ class SecureWebViewClient(
     }
 
     override fun onPageStarted(view: WebView, url: String?, favicon: Bitmap?) {
+        mainFrameFailed = false
         if (!urlPolicy.isAllowed(url)) {
+            mainFrameFailed = true
             view.stopLoading()
             onStateChanged(KioskUiState.BlockedNavigation)
             return
@@ -37,7 +44,29 @@ class SecureWebViewClient(
     }
 
     override fun onPageFinished(view: WebView, url: String?) {
-        onStateChanged(KioskUiState.WebContent)
+        if (!mainFrameFailed && urlPolicy.isAllowed(url)) {
+            onStateChanged(KioskUiState.WebContent)
+        }
+    }
+
+    override fun onReceivedError(view: WebView, request: WebResourceRequest, error: WebResourceError) {
+        if (request.isForMainFrame) {
+            mainFrameFailed = true
+            onStateChanged(KioskUiState.LoadError(error.description?.toString().orEmpty()))
+        }
+    }
+
+    override fun onReceivedHttpError(view: WebView, request: WebResourceRequest, errorResponse: WebResourceResponse) {
+        if (request.isForMainFrame) {
+            mainFrameFailed = true
+            onStateChanged(KioskUiState.LoadError("HTTP ${errorResponse.statusCode}"))
+        }
+    }
+
+    override fun onReceivedSslError(view: WebView, handler: SslErrorHandler, error: SslError) {
+        mainFrameFailed = true
+        handler.cancel()
+        onStateChanged(KioskUiState.LoadError("TLS certificate error"))
     }
 
     private fun blockedResponse(): WebResourceResponse {
