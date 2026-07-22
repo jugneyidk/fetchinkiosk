@@ -20,6 +20,8 @@ Fetchin Kiosk is a native Android kiosk shell for tablets. It loads one authoriz
 - Debug builds show a visible weaker-security fallback banner instead of silently pretending to be production kiosk mode.
 - Connectivity is checked before initial load and retry using Android validated internet capability.
 - Main-frame WebView network, HTTP, and TLS errors show custom error states.
+- WebView renderer death recreates the WebView and shows a recoverable error state.
+- Hidden admin gesture opens an admin challenge state only; it does not unlock kiosk or stop Lock Task.
 - Device admin receiver exists.
 - Kiosk controller can attempt Lock Task only when permitted.
 - Admin PIN is interface only.
@@ -45,7 +47,7 @@ Fetchin Kiosk is a native Android kiosk shell for tablets. It loads one authoriz
 - DevicePolicyManager lock task package allowlisting.
 - Real-device Device Owner and Lock Task validation.
 - Connectivity observer.
-- WebView renderer crash recovery.
+- Manual validation of renderer crash recovery on target tablets.
 - Renderer crash recovery.
 - DataStore or managed config.
 - Instrumented tests.
@@ -64,8 +66,7 @@ Fetchin Kiosk is a native Android kiosk shell for tablets. It loads one authoriz
 ## Required Implementation Order
 
 1. Fix any build/lint failures recorded in `PROJECT_STATUS.md`.
-2. Implement WebView renderer crash recovery for `KIOSK-052`.
-3. Implement admin gesture and PIN boundary for `KIOSK-040`/`KIOSK-041`.
+2. Implement secure PIN boundary for `KIOSK-041`.
 4. Validate Device Owner and Lock Task behavior on real hardware for `KIOSK-061` when a tablet is available.
 5. Implement admin gesture plus secure PIN design for `KIOSK-040` and `KIOSK-041`.
 6. Implement Lock Task package setup for Device Owner devices.

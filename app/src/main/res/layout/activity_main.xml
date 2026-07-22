@@ -66,4 +66,11 @@
             android:visibility="gone" />
     </LinearLayout>
 
+    <View
+        android:id="@+id/adminGestureTarget"
+        android:layout_width="96dp"
+        android:layout_height="96dp"
+        android:layout_gravity="top|end"
+        android:importantForAccessibility="no" />
+
 </FrameLayout>

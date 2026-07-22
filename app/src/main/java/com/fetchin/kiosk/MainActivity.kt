@@ -1,8 +1,10 @@
 package com.fetchin.kiosk
 
 import android.os.Bundle
+import android.os.SystemClock
 import android.view.View
 import android.view.WindowManager
+import android.webkit.WebView
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import com.fetchin.kiosk.admin.AdminAccessController
@@ -22,20 +24,24 @@ class MainActivity : AppCompatActivity() {
     private lateinit var config: AppConfig
     private lateinit var kioskController: KioskController
     private lateinit var connectivityObserver: ConnectivityObserver
+    private lateinit var adminAccessController: AdminAccessController
+    private lateinit var currentWebView: WebView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        currentWebView = binding.kioskWebView
 
         config = AppConfig.default()
         kioskController = KioskController(this)
         connectivityObserver = AndroidConnectivityObserver(this)
-        AdminAccessController(config.adminGestureTapCount, config.adminGestureWindowMillis)
+        adminAccessController = AdminAccessController(config.adminGestureTapCount, config.adminGestureWindowMillis)
 
         applyScreenPolicy()
         configureBackBehavior()
         configureWebView()
+        configureAdminGesture()
         handleKioskStart(kioskController.startLockTaskIfAllowed())
     }
 
@@ -68,8 +74,8 @@ class MainActivity : AppCompatActivity() {
             this,
             object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
-                    if (binding.kioskWebView.canGoBack()) {
-                        binding.kioskWebView.goBack()
+                    if (currentWebView.canGoBack()) {
+                        currentWebView.goBack()
                     } else {
                         render(KioskUiState.WebContent)
                     }
@@ -79,14 +85,31 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun configureWebView() {
-        val urlPolicy = config.urlPolicy()
-        WebViewConfigurator(config).configure(binding.kioskWebView)
-        binding.kioskWebView.webViewClient = SecureWebViewClient(urlPolicy) { render(it) }
-        binding.kioskWebView.setDownloadListener { _, _, _, _, _ ->
-            render(KioskUiState.BlockedNavigation)
-        }
+        configureWebView(currentWebView)
         binding.retryButton.setOnClickListener {
             loadConfiguredSystem()
+        }
+    }
+
+    private fun configureWebView(webView: WebView) {
+        val urlPolicy = config.urlPolicy()
+        WebViewConfigurator(config).configure(webView)
+        webView.webViewClient = SecureWebViewClient(
+            urlPolicy = urlPolicy,
+            onStateChanged = { render(it) },
+            onRendererGone = { recoverWebViewRenderer(it) }
+        )
+        webView.setDownloadListener { _, _, _, _, _ ->
+            render(KioskUiState.BlockedNavigation)
+        }
+    }
+
+    private fun configureAdminGesture() {
+        binding.adminGestureTarget.setOnClickListener {
+            if (adminAccessController.recordTap(SystemClock.elapsedRealtime())) {
+                adminAccessController.reset()
+                render(KioskUiState.AdminChallenge(getString(R.string.state_admin_challenge_detail)))
+            }
         }
     }
 
@@ -119,7 +142,31 @@ class MainActivity : AppCompatActivity() {
             return
         }
         render(KioskUiState.Loading)
-        binding.kioskWebView.loadUrl(config.startUrl)
+        currentWebView.loadUrl(config.startUrl)
+    }
+
+    private fun recoverWebViewRenderer(didCrash: Boolean) {
+        recreateWebView()
+        val detail = if (didCrash) {
+            getString(R.string.state_renderer_crash_detail)
+        } else {
+            getString(R.string.state_renderer_gone_detail)
+        }
+        render(KioskUiState.LoadError(detail))
+    }
+
+    private fun recreateWebView() {
+        val oldWebView = currentWebView
+        val replacement = WebView(this)
+        replacement.id = R.id.kioskWebView
+        replacement.layoutParams = oldWebView.layoutParams
+        binding.root.removeView(oldWebView)
+        oldWebView.stopLoading()
+        oldWebView.setDownloadListener(null)
+        oldWebView.destroy()
+        currentWebView = replacement
+        configureWebView(replacement)
+        binding.root.addView(replacement, 0)
     }
 
     private fun render(state: KioskUiState) {
@@ -139,16 +186,18 @@ class MainActivity : AppCompatActivity() {
             is KioskUiState.LoadError -> getString(R.string.state_load_error)
             KioskUiState.BlockedNavigation -> getString(R.string.state_blocked_navigation)
             is KioskUiState.NotProvisioned -> getString(R.string.state_not_provisioned)
+            is KioskUiState.AdminChallenge -> getString(R.string.state_admin_challenge)
             KioskUiState.Maintenance -> getString(R.string.state_maintenance)
         }
         binding.statusMessage.text = when (state) {
             is KioskUiState.Offline -> state.detail
             is KioskUiState.LoadError -> state.detail.ifBlank { getString(R.string.state_load_error_detail) }
             is KioskUiState.NotProvisioned -> state.detail
+            is KioskUiState.AdminChallenge -> state.detail
             else -> ""
         }
         binding.statusMessage.visibility = when (state) {
-            is KioskUiState.Offline, is KioskUiState.LoadError, is KioskUiState.NotProvisioned -> View.VISIBLE
+            is KioskUiState.Offline, is KioskUiState.LoadError, is KioskUiState.NotProvisioned, is KioskUiState.AdminChallenge -> View.VISIBLE
             else -> View.GONE
         }
         binding.retryButton.visibility = when (state) {

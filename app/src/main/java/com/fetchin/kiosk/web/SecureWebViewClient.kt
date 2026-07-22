@@ -3,6 +3,7 @@ package com.fetchin.kiosk.web
 import android.graphics.Bitmap
 import android.net.http.SslError
 import android.webkit.SslErrorHandler
+import android.webkit.RenderProcessGoneDetail
 import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
 import android.webkit.WebResourceError
@@ -13,7 +14,8 @@ import java.io.ByteArrayInputStream
 
 class SecureWebViewClient(
     private val urlPolicy: UrlPolicy,
-    private val onStateChanged: (KioskUiState) -> Unit
+    private val onStateChanged: (KioskUiState) -> Unit,
+    private val onRendererGone: (Boolean) -> Unit
 ) : WebViewClient() {
     private var mainFrameFailed = false
 
@@ -67,6 +69,12 @@ class SecureWebViewClient(
         mainFrameFailed = true
         handler.cancel()
         onStateChanged(KioskUiState.LoadError("TLS certificate error"))
+    }
+
+    override fun onRenderProcessGone(view: WebView, detail: RenderProcessGoneDetail): Boolean {
+        mainFrameFailed = true
+        onRendererGone(detail.didCrash())
+        return true
     }
 
     private fun blockedResponse(): WebResourceResponse {

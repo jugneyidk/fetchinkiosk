@@ -8,5 +8,6 @@ sealed interface KioskUiState {
     data class LoadError(val detail: String) : KioskUiState
     data object BlockedNavigation : KioskUiState
     data class NotProvisioned(val detail: String) : KioskUiState
+    data class AdminChallenge(val detail: String) : KioskUiState
     data object Maintenance : KioskUiState
 }

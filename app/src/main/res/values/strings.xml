@@ -8,8 +8,12 @@
     <string name="state_offline_detail">Check the network connection and retry.</string>
     <string name="state_load_error">The system could not be loaded</string>
     <string name="state_load_error_detail">Retry or contact an administrator if the problem continues.</string>
+    <string name="state_renderer_crash_detail">WebView renderer crashed and was restarted. Retry to reload the system.</string>
+    <string name="state_renderer_gone_detail">WebView renderer stopped and was restarted. Retry to reload the system.</string>
     <string name="state_blocked_navigation">Navigation blocked by kiosk policy</string>
     <string name="state_not_provisioned">Device is not provisioned for kiosk mode</string>
+    <string name="state_admin_challenge">Administrator access</string>
+    <string name="state_admin_challenge_detail">PIN verification is not implemented yet. Kiosk mode remains active.</string>
     <string name="state_maintenance">Maintenance mode</string>
     <string name="action_retry">Retry</string>
     <string name="development_fallback_warning">Development fallback: kiosk security is not active. %1$s</string>

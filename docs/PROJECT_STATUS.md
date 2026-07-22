@@ -3,9 +3,9 @@
 | Field | Value |
 | --- | --- |
 | Updated | 2026-07-22 |
-| Stage | Connectivity and WebView error handling implementation started |
-| Last change | Completed initial KIOSK-050/KIOSK-051 connectivity checks, retry behavior, and main-frame WebView error handling |
-| Next task | Implement KIOSK-052 WebView renderer crash recovery or KIOSK-040 admin gesture flow |
+| Stage | Admin access entry implementation started |
+| Last change | Completed initial KIOSK-040 hidden admin gesture entry without unlocking kiosk |
+| Next task | Implement KIOSK-041 secure PIN verification boundary |
 | Build status | Passing: `assembleDebug` |
 | Test status | Passing: `testDebugUnitTest`, 13 tests |
 | Lint status | Passing: `lintDebug` |
@@ -18,8 +18,8 @@
 | Phase 1 Shell Visual | 35% |
 | Phase 2 Secure WebView | 70% |
 | Phase 3 Kiosk Control | 55% |
-| Phase 4 Admin Access | 10% |
-| Phase 5 Resilience | 45% |
+| Phase 4 Admin Access | 30% |
+| Phase 5 Resilience | 70% |
 | Phase 6 Provisioning | 20% |
 | Phase 7 Tests And Hardening | 10% |
 
@@ -40,10 +40,11 @@
 
 ## Commands Passing
 
-- `.\gradlew.bat testDebugUnitTest --console=plain` passed in 5s after KIOSK-050/KIOSK-051 changes.
-- `.\gradlew.bat assembleDebug --console=plain` passed in 3s after KIOSK-050/KIOSK-051 changes.
-- `.\gradlew.bat lintDebug --console=plain` passed in 13s after KIOSK-050/KIOSK-051 changes.
+- `.\gradlew.bat testDebugUnitTest --console=plain` passed in 31s after KIOSK-040 changes.
+- `.\gradlew.bat assembleDebug --console=plain` passed in 3s after KIOSK-040 changes.
+- `.\gradlew.bat lintDebug --console=plain` passed in 18s after KIOSK-040 changes.
 - `UrlPolicyTest` ran 13 tests, 0 failures, 0 errors.
+- `AdminAccessControllerTest` ran 3 tests, 0 failures, 0 errors.
 
 ## Commands Failing
 
@@ -64,7 +65,8 @@
 - Admin PIN strategy is not selected.
 - Real production hosts may need additional allowlist entries for subresources if the web system loads assets from dedicated domains.
 - Connectivity uses Android validated internet capability, so captive portals and networks without validation are treated as offline.
-- Main-frame WebView errors are handled, but renderer crash recovery still belongs to KIOSK-052.
+- Renderer death is handled by recreating the WebView, but still needs manual validation on a real tablet.
+- Hidden admin gesture currently opens only a challenge state; secure PIN verification and maintenance exit remain pending.
 
 ## Local Repair Notes
 

@@ -40,7 +40,7 @@ Each task must end with validation and documentation updates. Status values: pen
 
 | Task | Objective | Files | Dependencies | Done | Tests | Risks | Status |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| KIOSK-040 | Wire hidden gesture | `MainActivity`, `admin` | UI | Gesture opens PIN only | Unit/manual | Discoverability vs abuse | pending |
+| KIOSK-040 | Wire hidden gesture | `MainActivity`, `admin` | UI | Hidden tap gesture opens admin challenge state only | Unit tests passed | Gesture must not unlock without PIN | completed initial |
 | KIOSK-041 | Implement secure PIN verifier | `admin`, `security` | Keystore/DataStore or remote | No plain PIN | Unit/security review | Weak derivation | pending |
 | KIOSK-042 | Maintenance mode screen | `ui`, layout | Admin flow | Timed admin mode | Manual | User escapes too long | pending |
 | KIOSK-043 | Re-enter kiosk | `kiosk`, `admin` | Lock Task | Kiosk restores | Device test | Lock Task failure | pending |
@@ -51,7 +51,7 @@ Each task must end with validation and documentation updates. Status values: pen
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | KIOSK-050 | Connectivity observer | `util`, `ui` | ConnectivityManager | Offline state checks validated internet before loading/retry | Build/lint validated | Captive portals may appear offline by design | completed initial |
 | KIOSK-051 | WebView error handling | `web`, `ui` | WebViewClient callbacks | Main-frame network, HTTP, and TLS errors show custom error state | Build/lint validated | Needs instrumented WebView tests | completed initial |
-| KIOSK-052 | Renderer crash recovery | `web` | API support | WebView can recover | Manual | Data loss | pending |
+| KIOSK-052 | Renderer crash recovery | `web` | API support | Renderer death recreates WebView and shows recoverable error | Build/lint validated | Needs manual renderer crash test on device | completed initial |
 | KIOSK-053 | Minimal persistence | `config` | DataStore if needed | Config survives reboot | Unit/manual | Local tampering | pending |
 
 ## Phase 6: Provisioning

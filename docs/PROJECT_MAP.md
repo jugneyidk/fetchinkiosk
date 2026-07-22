@@ -84,12 +84,12 @@ This file is the navigable map for Fetchin Kiosk. Keep it synchronized with real
 | `AppConfig` | Skeleton | Centralizes provisional start URL, hosts, flags, and admin gesture values. |
 | `UrlPolicy` | Implemented | Validates HTTPS and allowlisted host boundaries, returning allow/block reasons. |
 | `WebViewConfigurator` | Skeleton | Applies initial secure WebView settings. |
-| `SecureWebViewClient` | Implemented initial | Blocks disallowed top-level navigation and returns 403 for disallowed subresources. |
+| `SecureWebViewClient` | Implemented initial | Blocks disallowed navigation, returns 403 for disallowed subresources, reports main-frame load errors, and handles renderer death. |
 | `KioskController` | Implemented initial | Starts/stops Lock Task when permitted and exposes provisioning status. |
 | `KioskProvisioningStatus` | Implemented initial | Carries Device Owner, Lock Task permission, and package state for UI decisions. |
 | `DeviceOwnerStatusProvider` | Skeleton | Reads Device Owner and Lock Task status. |
 | `KioskDeviceAdminReceiver` | Skeleton | Device admin receiver for provisioning. |
-| `AdminAccessController` | Skeleton | Tracks hidden gesture. |
+| `AdminAccessController` | Implemented initial | Tracks hidden tap gesture timing without authorizing kiosk exit. |
 | `AdminPinVerifier` | Interface | Defines future PIN verification boundary. |
 | `KioskUiState` | Skeleton | Represents visual states. |
 | `ConnectivityObserver` | Interface | Connectivity abstraction used before load/retry. |
@@ -131,7 +131,7 @@ MainActivity -> KioskController -> DevicePolicyManager status -> startLockTask w
 Planned:
 
 ```text
-Hidden gesture -> PIN dialog -> AdminPinVerifier -> maintenance unlock timer -> KioskController.stopLockTaskFromAdminFlow -> maintenance menu -> re-enter Lock Task
+Hidden gesture -> admin challenge state -> future PIN verifier -> maintenance unlock timer -> KioskController.stopLockTaskFromAdminFlow -> maintenance menu -> re-enter Lock Task
 ```
 
 ## Error Recovery Flow
@@ -139,7 +139,7 @@ Hidden gesture -> PIN dialog -> AdminPinVerifier -> maintenance unlock timer -> 
 Planned:
 
 ```text
-Offline before load/retry -> offline state -> retry rechecks network -> WebView main-frame network/HTTP/TLS error -> load error state -> retry loads configured start URL
+Offline before load/retry -> offline state -> retry rechecks network -> WebView main-frame network/HTTP/TLS error -> load error state -> renderer death recreates WebView -> retry loads configured start URL
 ```
 
 ## Dependency Direction
