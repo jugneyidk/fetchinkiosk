@@ -1,0 +1,1 @@
+-keep class com.fetchin.kiosk.admin.KioskDeviceAdminReceiver { *; }

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Fetchin Kiosk</string>
+    <string name="device_admin_description">Allows Fetchin Kiosk to manage dedicated kiosk mode on provisioned devices.</string>
+    <string name="state_initializing">Initializing kiosk</string>
+    <string name="state_loading">Loading system</string>
+    <string name="state_offline">No connection</string>
+    <string name="state_load_error">The system could not be loaded</string>
+    <string name="state_blocked_navigation">Navigation blocked by kiosk policy</string>
+    <string name="state_not_provisioned">Device is not provisioned for kiosk mode</string>
+    <string name="state_maintenance">Maintenance mode</string>
+    <string name="action_retry">Retry</string>
+</resources>
