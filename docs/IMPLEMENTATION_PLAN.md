@@ -41,7 +41,7 @@ Each task must end with validation and documentation updates. Status values: pen
 | Task | Objective | Files | Dependencies | Done | Tests | Risks | Status |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | KIOSK-040 | Wire hidden gesture | `MainActivity`, `admin` | UI | Hidden tap gesture opens admin challenge state only | Unit tests passed | Gesture must not unlock without PIN | completed initial |
-| KIOSK-041 | Implement secure PIN verifier | `admin`, `security` | Keystore/DataStore or remote | No plain PIN | Unit/security review | Weak derivation | pending |
+| KIOSK-041 | Implement secure PIN verifier | `admin`, `security` | PBKDF2 config | PIN verifies against configurable PBKDF2 hash/salt; no repo PIN | Unit tests passed | Needs provisioning/config source before production | completed initial |
 | KIOSK-042 | Maintenance mode screen | `ui`, layout | Admin flow | Timed admin mode | Manual | User escapes too long | pending |
 | KIOSK-043 | Re-enter kiosk | `kiosk`, `admin` | Lock Task | Kiosk restores | Device test | Lock Task failure | pending |
 

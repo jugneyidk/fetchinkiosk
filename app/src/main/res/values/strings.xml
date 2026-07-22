@@ -13,9 +13,14 @@
     <string name="state_blocked_navigation">Navigation blocked by kiosk policy</string>
     <string name="state_not_provisioned">Device is not provisioned for kiosk mode</string>
     <string name="state_admin_challenge">Administrator access</string>
-    <string name="state_admin_challenge_detail">PIN verification is not implemented yet. Kiosk mode remains active.</string>
+    <string name="state_admin_challenge_detail">Enter the administrator PIN. Kiosk mode remains active until verification succeeds.</string>
+    <string name="state_admin_pin_invalid">PIN verification failed. Kiosk mode remains active.</string>
+    <string name="state_admin_pin_not_configured">Admin PIN is not configured on this build. Kiosk mode remains active.</string>
     <string name="state_maintenance">Maintenance mode</string>
     <string name="action_retry">Retry</string>
+    <string name="action_verify">Verify</string>
+    <string name="action_cancel">Cancel</string>
+    <string name="admin_pin_hint">PIN</string>
     <string name="development_fallback_warning">Development fallback: kiosk security is not active. %1$s</string>
     <string name="provisioning_detail">Package: %1$s\nDevice Owner: %2$s\nLock Task permitted: %3$s</string>
     <string name="value_yes">yes</string>

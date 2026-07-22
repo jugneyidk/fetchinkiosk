@@ -18,7 +18,7 @@ Resolve these before the listed phase limit.
 | Authentication model | Session/cookie/logout behavior | Web app handles auth | Required session policy | Before Phase 5 |
 | Session timeout | Privacy and operational behavior | Follow web app | Timeout and idle policy | Before Phase 5 |
 | Update policy | Fleet reliability | Manual ADB in development | MDM/EMM/manual process | Before production |
-| PIN strategy | Admin escape security | Interface only | Keystore local, derived hash, or remote validation | Before Phase 4 completion |
+| PIN configuration source | Admin escape security | PBKDF2 verifier with empty hash/salt in repo | Device-local provisioning, Keystore-backed storage, or remote validation | Before Phase 4 completion |
 | Target tablets | OEM policy differences | Unknown Android tablet | Manufacturer/model/Android version | Before Phase 6 validation |
 | MDM future | Config/update strategy | Future roadmap | Vendor or no MDM | Before fleet rollout |
 | Android SDK version | Build reproducibility | compile/target API 36 | Confirm production SDK baseline | Before release |

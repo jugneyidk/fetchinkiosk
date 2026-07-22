@@ -3,11 +3,11 @@
 | Field | Value |
 | --- | --- |
 | Updated | 2026-07-22 |
-| Stage | Admin access entry implementation started |
-| Last change | Completed initial KIOSK-040 hidden admin gesture entry without unlocking kiosk |
-| Next task | Implement KIOSK-041 secure PIN verification boundary |
+| Stage | Secure PIN verification boundary implementation started |
+| Last change | Completed initial KIOSK-041 PBKDF2 admin PIN verifier with no embedded PIN |
+| Next task | Implement KIOSK-042 maintenance mode screen and controlled admin session |
 | Build status | Passing: `assembleDebug` |
-| Test status | Passing: `testDebugUnitTest`, 13 tests |
+| Test status | Passing: `testDebugUnitTest`, 20 tests |
 | Lint status | Passing: `lintDebug` |
 
 ## Phase Progress
@@ -18,7 +18,7 @@
 | Phase 1 Shell Visual | 35% |
 | Phase 2 Secure WebView | 70% |
 | Phase 3 Kiosk Control | 55% |
-| Phase 4 Admin Access | 30% |
+| Phase 4 Admin Access | 55% |
 | Phase 5 Resilience | 70% |
 | Phase 6 Provisioning | 20% |
 | Phase 7 Tests And Hardening | 10% |
@@ -40,11 +40,12 @@
 
 ## Commands Passing
 
-- `.\gradlew.bat testDebugUnitTest --console=plain` passed in 31s after KIOSK-040 changes.
-- `.\gradlew.bat assembleDebug --console=plain` passed in 3s after KIOSK-040 changes.
-- `.\gradlew.bat lintDebug --console=plain` passed in 18s after KIOSK-040 changes.
+- `.\gradlew.bat testDebugUnitTest --console=plain` passed in 40s after KIOSK-041 changes.
+- `.\gradlew.bat assembleDebug --console=plain` passed in 5s after KIOSK-041 changes.
+- `.\gradlew.bat lintDebug --console=plain` passed in 11s after KIOSK-041 changes.
 - `UrlPolicyTest` ran 13 tests, 0 failures, 0 errors.
 - `AdminAccessControllerTest` ran 3 tests, 0 failures, 0 errors.
+- `Pbkdf2AdminPinVerifierTest` ran 4 tests, 0 failures, 0 errors.
 
 ## Commands Failing
 
@@ -62,11 +63,11 @@
 - Production URL and domains are unknown.
 - Target tablet model is unknown.
 - Device Owner behavior varies by OS/OEM.
-- Admin PIN strategy is not selected.
+- Admin PIN uses configurable PBKDF2 hash/salt, but production config source is not selected.
 - Real production hosts may need additional allowlist entries for subresources if the web system loads assets from dedicated domains.
 - Connectivity uses Android validated internet capability, so captive portals and networks without validation are treated as offline.
 - Renderer death is handled by recreating the WebView, but still needs manual validation on a real tablet.
-- Hidden admin gesture currently opens only a challenge state; secure PIN verification and maintenance exit remain pending.
+- Hidden admin gesture now opens a PIN dialog; maintenance exit/session handling remains pending.
 
 ## Local Repair Notes
 

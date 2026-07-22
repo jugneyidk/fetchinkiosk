@@ -90,7 +90,9 @@ This file is the navigable map for Fetchin Kiosk. Keep it synchronized with real
 | `DeviceOwnerStatusProvider` | Skeleton | Reads Device Owner and Lock Task status. |
 | `KioskDeviceAdminReceiver` | Skeleton | Device admin receiver for provisioning. |
 | `AdminAccessController` | Implemented initial | Tracks hidden tap gesture timing without authorizing kiosk exit. |
-| `AdminPinVerifier` | Interface | Defines future PIN verification boundary. |
+| `AdminPinVerifier` | Interface | Defines admin PIN verification boundary. |
+| `AdminPinConfig` | Implemented initial | Holds PBKDF2 hash/salt/iteration configuration without storing a plain PIN. |
+| `Pbkdf2AdminPinVerifier` | Implemented initial | Verifies PIN candidates against configurable PBKDF2 material and clears candidate arrays. |
 | `KioskUiState` | Skeleton | Represents visual states. |
 | `ConnectivityObserver` | Interface | Connectivity abstraction used before load/retry. |
 | `AndroidConnectivityObserver` | Implemented initial | Checks Android validated internet capability. |
@@ -131,7 +133,7 @@ MainActivity -> KioskController -> DevicePolicyManager status -> startLockTask w
 Planned:
 
 ```text
-Hidden gesture -> admin challenge state -> future PIN verifier -> maintenance unlock timer -> KioskController.stopLockTaskFromAdminFlow -> maintenance menu -> re-enter Lock Task
+Hidden gesture -> PIN dialog -> PBKDF2 verifier -> maintenance state when valid -> future timed admin session -> future KioskController.stopLockTaskFromAdminFlow -> maintenance menu -> re-enter Lock Task
 ```
 
 ## Error Recovery Flow

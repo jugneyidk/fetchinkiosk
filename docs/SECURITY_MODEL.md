@@ -143,7 +143,10 @@ Forbidden:
 
 - No real PIN in source code.
 - No plain-text PIN in preferences.
-- Use derived hash with salt, Android Keystore, or remote validation.
+- Current implementation supports PBKDF2 with Base64 hash and salt configuration.
+- Default repository configuration is intentionally empty, so no PIN can verify out of the box.
+- Production must provide hash/salt through an approved provisioning/configuration path.
+- Android Keystore or remote validation remains recommended for production hardening.
 - Gesture alone must never unlock kiosk.
 - PIN attempts and lockouts should be rate-limited in final implementation.
 

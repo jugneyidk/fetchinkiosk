@@ -1,13 +1,16 @@
 package com.fetchin.kiosk
 
+import android.text.InputType
 import android.os.Bundle
 import android.os.SystemClock
 import android.view.View
 import android.view.WindowManager
 import android.webkit.WebView
 import androidx.activity.OnBackPressedCallback
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.fetchin.kiosk.admin.AdminAccessController
+import com.fetchin.kiosk.admin.AdminPinVerifier
 import com.fetchin.kiosk.config.AppConfig
 import com.fetchin.kiosk.databinding.ActivityMainBinding
 import com.fetchin.kiosk.kiosk.KioskController
@@ -25,6 +28,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var kioskController: KioskController
     private lateinit var connectivityObserver: ConnectivityObserver
     private lateinit var adminAccessController: AdminAccessController
+    private lateinit var adminPinVerifier: AdminPinVerifier
     private lateinit var currentWebView: WebView
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -37,6 +41,7 @@ class MainActivity : AppCompatActivity() {
         kioskController = KioskController(this)
         connectivityObserver = AndroidConnectivityObserver(this)
         adminAccessController = AdminAccessController(config.adminGestureTapCount, config.adminGestureWindowMillis)
+        adminPinVerifier = config.adminPinVerifier()
 
         applyScreenPolicy()
         configureBackBehavior()
@@ -108,9 +113,48 @@ class MainActivity : AppCompatActivity() {
         binding.adminGestureTarget.setOnClickListener {
             if (adminAccessController.recordTap(SystemClock.elapsedRealtime())) {
                 adminAccessController.reset()
-                render(KioskUiState.AdminChallenge(getString(R.string.state_admin_challenge_detail)))
+                showAdminPinChallenge()
             }
         }
+    }
+
+    private fun showAdminPinChallenge() {
+        val pinInput = androidx.appcompat.widget.AppCompatEditText(this)
+        pinInput.inputType = InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_VARIATION_PASSWORD
+        pinInput.hint = getString(R.string.admin_pin_hint)
+        AlertDialog.Builder(this)
+            .setTitle(R.string.state_admin_challenge)
+            .setMessage(R.string.state_admin_challenge_detail)
+            .setView(pinInput)
+            .setPositiveButton(R.string.action_verify) { _, _ ->
+                verifyAdminPin(pinInput)
+            }
+            .setNegativeButton(R.string.action_cancel) { dialog, _ ->
+                pinInput.text?.clear()
+                dialog.dismiss()
+            }
+            .show()
+    }
+
+    private fun verifyAdminPin(pinInput: androidx.appcompat.widget.AppCompatEditText) {
+        val candidate = editableToCharArray(pinInput.text)
+        val verified = adminPinVerifier.verify(candidate)
+        pinInput.text?.clear()
+        if (verified) {
+            render(KioskUiState.Maintenance)
+        } else {
+            val detail = if (config.adminPinConfig.isConfigured) {
+                getString(R.string.state_admin_pin_invalid)
+            } else {
+                getString(R.string.state_admin_pin_not_configured)
+            }
+            render(KioskUiState.AdminChallenge(detail))
+        }
+    }
+
+    private fun editableToCharArray(editable: CharSequence?): CharArray {
+        if (editable.isNullOrEmpty()) return CharArray(0)
+        return CharArray(editable.length) { index -> editable[index] }
     }
 
     private fun handleKioskStart(result: KioskStartResult) {
