@@ -148,6 +148,7 @@ Forbidden:
 - Production must provide hash/salt through an approved provisioning/configuration path.
 - Android Keystore or remote validation remains recommended for production hardening.
 - Gesture alone must never unlock kiosk.
+- Admin maintenance attempts are logged by event type only, without PIN values or sensitive session data.
 - PIN attempts and lockouts should be rate-limited in final implementation.
 
 ## Android Keystore Recommendation

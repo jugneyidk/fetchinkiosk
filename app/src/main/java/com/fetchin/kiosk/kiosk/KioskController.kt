@@ -12,7 +12,7 @@ class KioskController(private val activity: Activity) {
     private val statusProvider = DeviceOwnerStatusProvider(devicePolicyManager, adminComponent)
 
     fun startLockTaskIfAllowed(): KioskStartResult {
-        val status = provisioningStatus()
+        val status = ensureLockTaskPackageAllowed() ?: return KioskStartResult.Failed(provisioningStatus())
         return if (status.isLockTaskPermitted) {
             runCatching {
                 activity.startLockTask()
@@ -22,6 +22,17 @@ class KioskController(private val activity: Activity) {
             }
         } else {
             KioskStartResult.NotPermitted(status)
+        }
+    }
+
+    private fun ensureLockTaskPackageAllowed(): KioskProvisioningStatus? {
+        val status = provisioningStatus()
+        if (!status.isDeviceOwner || status.isLockTaskPermitted) return status
+        return runCatching {
+            devicePolicyManager.setLockTaskPackages(adminComponent, arrayOf(activity.packageName))
+            provisioningStatus()
+        }.getOrElse {
+            null
         }
     }
 

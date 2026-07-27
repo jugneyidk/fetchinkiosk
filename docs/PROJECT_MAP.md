@@ -125,15 +125,13 @@ Start URL -> WebView -> SecureWebViewClient -> UrlPolicy -> allow HTTPS allowlis
 ## Kiosk Entry Flow
 
 ```text
-MainActivity -> KioskController -> DevicePolicyManager status -> startLockTask when allowed -> release blocks on not-provisioned -> debug loads with visible weaker fallback banner
+MainActivity -> KioskController -> DevicePolicyManager status -> setLockTaskPackages when Device Owner and not already permitted -> startLockTask when allowed -> release blocks on not-provisioned -> debug loads with visible weaker fallback banner
 ```
 
 ## Admin Exit Flow
 
-Planned:
-
 ```text
-Hidden gesture -> PIN dialog -> PBKDF2 verifier -> maintenance state when valid -> future timed admin session -> future KioskController.stopLockTaskFromAdminFlow -> maintenance menu -> re-enter Lock Task
+Hidden gesture -> PIN dialog -> PBKDF2 verifier -> KioskController.stopLockTaskFromAdminFlow -> timed maintenance state -> return action or timeout -> KioskController.startLockTaskIfAllowed -> configured system or not-provisioned state
 ```
 
 ## Error Recovery Flow

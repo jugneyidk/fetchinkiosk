@@ -3,9 +3,9 @@
 | Field | Value |
 | --- | --- |
 | Updated | 2026-07-22 |
-| Stage | Secure PIN verification boundary implementation started |
-| Last change | Completed initial KIOSK-041 PBKDF2 admin PIN verifier with no embedded PIN |
-| Next task | Implement KIOSK-042 maintenance mode screen and controlled admin session |
+| Stage | Lock Task package allowlisting initial implementation complete |
+| Last change | Completed initial KIOSK-031 DevicePolicyManager Lock Task package allowlisting |
+| Next task | Validate Device Owner and Lock Task behavior on real hardware when a tablet is available |
 | Build status | Passing: `assembleDebug` |
 | Test status | Passing: `testDebugUnitTest`, 20 tests |
 | Lint status | Passing: `lintDebug` |
@@ -17,8 +17,8 @@
 | Phase 0 Preparation | 100% |
 | Phase 1 Shell Visual | 35% |
 | Phase 2 Secure WebView | 70% |
-| Phase 3 Kiosk Control | 55% |
-| Phase 4 Admin Access | 55% |
+| Phase 3 Kiosk Control | 70% |
+| Phase 4 Admin Access | 85% |
 | Phase 5 Resilience | 70% |
 | Phase 6 Provisioning | 20% |
 | Phase 7 Tests And Hardening | 10% |
@@ -40,9 +40,9 @@
 
 ## Commands Passing
 
-- `.\gradlew.bat testDebugUnitTest --console=plain` passed in 40s after KIOSK-041 changes.
-- `.\gradlew.bat assembleDebug --console=plain` passed in 5s after KIOSK-041 changes.
-- `.\gradlew.bat lintDebug --console=plain` passed in 11s after KIOSK-041 changes.
+- `.\gradlew.bat testDebugUnitTest --console=plain` passed in 5s after KIOSK-031 changes.
+- `.\gradlew.bat assembleDebug --console=plain` passed in 2s after KIOSK-031 changes.
+- `.\gradlew.bat lintDebug --console=plain` passed in 7s after KIOSK-031 changes.
 - `UrlPolicyTest` ran 13 tests, 0 failures, 0 errors.
 - `AdminAccessControllerTest` ran 3 tests, 0 failures, 0 errors.
 - `Pbkdf2AdminPinVerifierTest` ran 4 tests, 0 failures, 0 errors.
@@ -67,7 +67,10 @@
 - Real production hosts may need additional allowlist entries for subresources if the web system loads assets from dedicated domains.
 - Connectivity uses Android validated internet capability, so captive portals and networks without validation are treated as offline.
 - Renderer death is handled by recreating the WebView, but still needs manual validation on a real tablet.
-- Hidden admin gesture now opens a PIN dialog; maintenance exit/session handling remains pending.
+- Hidden admin gesture now opens a PIN dialog; valid PIN enters timed maintenance mode.
+- Maintenance mode attempts controlled Lock Task stop after PIN verification and attempts Lock Task restart on return or timeout.
+- Controlled Lock Task exit/re-entry still needs real Device Owner hardware validation.
+- Device Owner builds attempt to allowlist their own package before starting Lock Task; this still needs real hardware validation.
 
 ## Local Repair Notes
 

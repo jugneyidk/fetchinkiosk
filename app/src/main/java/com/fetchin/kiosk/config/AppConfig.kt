@@ -14,6 +14,7 @@ data class AppConfig(
     val adminGestureTapCount: Int,
     val adminGestureWindowMillis: Long,
     val adminPinConfig: AdminPinConfig,
+    val adminSessionMillis: Long,
     val userAgentSuffix: String?
 ) {
     fun urlPolicy(): UrlPolicy = UrlPolicy(allowedHosts)
@@ -38,6 +39,7 @@ data class AppConfig(
                 iterations = BuildConfig.DEFAULT_ADMIN_PIN_ITERATIONS,
                 keyLengthBits = BuildConfig.DEFAULT_ADMIN_PIN_KEY_LENGTH_BITS
             ),
+            adminSessionMillis = BuildConfig.DEFAULT_ADMIN_SESSION_MILLIS,
             userAgentSuffix = null
         )
     }

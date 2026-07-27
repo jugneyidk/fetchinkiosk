@@ -20,6 +20,7 @@ android {
         buildConfigField("String", "DEFAULT_ADMIN_PIN_SALT_BASE64", "\"\"")
         buildConfigField("int", "DEFAULT_ADMIN_PIN_ITERATIONS", "210000")
         buildConfigField("int", "DEFAULT_ADMIN_PIN_KEY_LENGTH_BITS", "256")
+        buildConfigField("long", "DEFAULT_ADMIN_SESSION_MILLIS", "300000L")
     }
 
     buildTypes {

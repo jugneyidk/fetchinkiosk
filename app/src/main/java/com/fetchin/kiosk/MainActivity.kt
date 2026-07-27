@@ -2,6 +2,8 @@ package com.fetchin.kiosk
 
 import android.text.InputType
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.os.SystemClock
 import android.view.View
 import android.view.WindowManager
@@ -16,6 +18,8 @@ import com.fetchin.kiosk.databinding.ActivityMainBinding
 import com.fetchin.kiosk.kiosk.KioskController
 import com.fetchin.kiosk.kiosk.KioskProvisioningStatus
 import com.fetchin.kiosk.kiosk.KioskStartResult
+import com.fetchin.kiosk.kiosk.KioskStopResult
+import com.fetchin.kiosk.security.KioskLogger
 import com.fetchin.kiosk.ui.KioskUiState
 import com.fetchin.kiosk.util.AndroidConnectivityObserver
 import com.fetchin.kiosk.util.ConnectivityObserver
@@ -30,6 +34,10 @@ class MainActivity : AppCompatActivity() {
     private lateinit var adminAccessController: AdminAccessController
     private lateinit var adminPinVerifier: AdminPinVerifier
     private lateinit var currentWebView: WebView
+    private val kioskLogger = KioskLogger()
+    private val mainHandler = Handler(Looper.getMainLooper())
+    private var currentUiState: KioskUiState = KioskUiState.Initializing
+    private val maintenanceTimeoutRunnable = Runnable { endMaintenanceMode() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -53,6 +61,11 @@ class MainActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         enterImmersiveMode()
+    }
+
+    override fun onDestroy() {
+        mainHandler.removeCallbacks(maintenanceTimeoutRunnable)
+        super.onDestroy()
     }
 
     private fun applyScreenPolicy() {
@@ -79,7 +92,9 @@ class MainActivity : AppCompatActivity() {
             this,
             object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
-                    if (currentWebView.canGoBack()) {
+                    if (currentUiState is KioskUiState.Maintenance) {
+                        endMaintenanceMode()
+                    } else if (currentWebView.canGoBack()) {
                         currentWebView.goBack()
                     } else {
                         render(KioskUiState.WebContent)
@@ -92,7 +107,7 @@ class MainActivity : AppCompatActivity() {
     private fun configureWebView() {
         configureWebView(currentWebView)
         binding.retryButton.setOnClickListener {
-            loadConfiguredSystem()
+            handlePrimaryAction()
         }
     }
 
@@ -141,7 +156,7 @@ class MainActivity : AppCompatActivity() {
         val verified = adminPinVerifier.verify(candidate)
         pinInput.text?.clear()
         if (verified) {
-            render(KioskUiState.Maintenance)
+            enterMaintenanceMode()
         } else {
             val detail = if (config.adminPinConfig.isConfigured) {
                 getString(R.string.state_admin_pin_invalid)
@@ -149,6 +164,27 @@ class MainActivity : AppCompatActivity() {
                 getString(R.string.state_admin_pin_not_configured)
             }
             render(KioskUiState.AdminChallenge(detail))
+        }
+    }
+
+    private fun enterMaintenanceMode() {
+        mainHandler.removeCallbacks(maintenanceTimeoutRunnable)
+        val stopResult = kioskController.stopLockTaskFromAdminFlow()
+        logMaintenanceStart(stopResult)
+        mainHandler.postDelayed(maintenanceTimeoutRunnable, config.adminSessionMillis)
+        render(KioskUiState.Maintenance(maintenanceDetail(stopResult)))
+    }
+
+    private fun endMaintenanceMode() {
+        mainHandler.removeCallbacks(maintenanceTimeoutRunnable)
+        kioskLogger.info("Admin maintenance session ended")
+        handleKioskStart(kioskController.startLockTaskIfAllowed())
+    }
+
+    private fun handlePrimaryAction() {
+        when (currentUiState) {
+            is KioskUiState.Maintenance -> endMaintenanceMode()
+            else -> loadConfiguredSystem()
         }
     }
 
@@ -214,6 +250,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun render(state: KioskUiState) {
+        currentUiState = state
         binding.statusPanel.visibility = when (state) {
             KioskUiState.WebContent -> View.GONE
             else -> View.VISIBLE
@@ -231,22 +268,42 @@ class MainActivity : AppCompatActivity() {
             KioskUiState.BlockedNavigation -> getString(R.string.state_blocked_navigation)
             is KioskUiState.NotProvisioned -> getString(R.string.state_not_provisioned)
             is KioskUiState.AdminChallenge -> getString(R.string.state_admin_challenge)
-            KioskUiState.Maintenance -> getString(R.string.state_maintenance)
+            is KioskUiState.Maintenance -> getString(R.string.state_maintenance)
         }
         binding.statusMessage.text = when (state) {
             is KioskUiState.Offline -> state.detail
             is KioskUiState.LoadError -> state.detail.ifBlank { getString(R.string.state_load_error_detail) }
             is KioskUiState.NotProvisioned -> state.detail
             is KioskUiState.AdminChallenge -> state.detail
+            is KioskUiState.Maintenance -> state.detail
             else -> ""
         }
         binding.statusMessage.visibility = when (state) {
-            is KioskUiState.Offline, is KioskUiState.LoadError, is KioskUiState.NotProvisioned, is KioskUiState.AdminChallenge -> View.VISIBLE
+            is KioskUiState.Offline, is KioskUiState.LoadError, is KioskUiState.NotProvisioned, is KioskUiState.AdminChallenge, is KioskUiState.Maintenance -> View.VISIBLE
             else -> View.GONE
         }
+        binding.retryButton.text = when (state) {
+            is KioskUiState.Maintenance -> getString(R.string.action_return_to_system)
+            else -> getString(R.string.action_retry)
+        }
         binding.retryButton.visibility = when (state) {
-            is KioskUiState.Offline, is KioskUiState.LoadError, KioskUiState.BlockedNavigation -> View.VISIBLE
+            is KioskUiState.Offline, is KioskUiState.LoadError, KioskUiState.BlockedNavigation, is KioskUiState.Maintenance -> View.VISIBLE
             else -> View.GONE
+        }
+    }
+
+    private fun maintenanceDetail(stopResult: KioskStopResult): String {
+        val minutes = (config.adminSessionMillis / 60_000L).coerceAtLeast(1L)
+        return when (stopResult) {
+            KioskStopResult.Stopped -> getString(R.string.state_maintenance_detail_stopped, minutes)
+            KioskStopResult.Failed -> getString(R.string.state_maintenance_detail_stop_failed, minutes)
+        }
+    }
+
+    private fun logMaintenanceStart(stopResult: KioskStopResult) {
+        when (stopResult) {
+            KioskStopResult.Stopped -> kioskLogger.info("Admin maintenance session started with Lock Task stopped")
+            KioskStopResult.Failed -> kioskLogger.warning("Admin maintenance session started but Lock Task stop failed")
         }
     }
 

@@ -74,8 +74,9 @@ adb install -r app\build\outputs\apk\debug\app-debug.apk
 ## Limitations Now
 
 - Lock Task allowlisting is not configured yet.
-- Admin PIN verification is an interface only.
-- WebView error recovery is skeletal.
+- Admin PIN verification uses configurable PBKDF2 material, but production config source is not selected.
+- Controlled Lock Task exit/re-entry needs real Device Owner hardware validation.
+- WebView renderer recovery needs real tablet validation.
 - Device configuration is currently compile-time defaults only.
 - No remote configuration, MDM, QR provisioning, printing, camera, downloads, or file uploads.
 

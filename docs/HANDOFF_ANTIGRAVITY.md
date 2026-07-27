@@ -23,9 +23,10 @@ Fetchin Kiosk is a native Android kiosk shell for tablets. It loads one authoriz
 - WebView renderer death recreates the WebView and shows a recoverable error state.
 - Hidden admin gesture opens an admin challenge state only; it does not unlock kiosk or stop Lock Task.
 - Admin PIN verification uses configurable PBKDF2 hash/salt material and no plain-text PIN in the repository.
+- Valid admin PIN enters a timed maintenance state, attempts controlled Lock Task stop, and attempts Lock Task restart on return or timeout.
 - Device admin receiver exists.
-- Kiosk controller can attempt Lock Task only when permitted.
-- Admin PIN is interface only.
+- Kiosk controller allowlists its own package when Device Owner and then starts Lock Task when permitted.
+- Admin PIN verification boundary is implemented with empty default verification material.
 - Device-local config and provisioning logic are not implemented.
 
 ## Finished
@@ -44,12 +45,8 @@ Fetchin Kiosk is a native Android kiosk shell for tablets. It loads one authoriz
 ## Not Implemented
 
 - Production source for admin PIN hash/salt configuration.
-- Admin maintenance UI.
-- DevicePolicyManager lock task package allowlisting.
 - Real-device Device Owner and Lock Task validation.
-- Connectivity observer.
 - Manual validation of renderer crash recovery on target tablets.
-- Renderer crash recovery.
 - DataStore or managed config.
 - Instrumented tests.
 
@@ -67,11 +64,8 @@ Fetchin Kiosk is a native Android kiosk shell for tablets. It loads one authoriz
 ## Required Implementation Order
 
 1. Fix any build/lint failures recorded in `PROJECT_STATUS.md`.
-2. Implement maintenance mode screen and timed admin session for `KIOSK-042`.
-4. Validate Device Owner and Lock Task behavior on real hardware for `KIOSK-061` when a tablet is available.
-5. Implement admin gesture plus secure PIN design for `KIOSK-040` and `KIOSK-041`.
-6. Implement Lock Task package setup for Device Owner devices.
-7. Add instrumented tests and manual validation notes.
+2. Validate Device Owner and Lock Task behavior on real hardware for `KIOSK-061` when a tablet is available.
+3. Add instrumented tests and manual validation notes.
 
 ## Decisions Not To Change Without ADR
 
@@ -113,7 +107,7 @@ Fetchin Kiosk is a native Android kiosk shell for tablets. It loads one authoriz
 
 ## First Recommended Task
 
-Run the documented validation commands again in Antigravity. If they fail, fix the smallest build compatibility issue first and update `docs/PROJECT_STATUS.md` before feature work.
+Run real-device Device Owner and Lock Task validation for `KIOSK-061` when a tablet is available. Until then, add instrumented tests or manual validation notes only when useful.
 
 ## Checklist Before Editing
 

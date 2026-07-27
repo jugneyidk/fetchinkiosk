@@ -17,7 +17,10 @@
     <string name="state_admin_pin_invalid">PIN verification failed. Kiosk mode remains active.</string>
     <string name="state_admin_pin_not_configured">Admin PIN is not configured on this build. Kiosk mode remains active.</string>
     <string name="state_maintenance">Maintenance mode</string>
+    <string name="state_maintenance_detail_stopped">Temporary admin session active for up to %1$d minutes. Lock Task will restart when the session ends.</string>
+    <string name="state_maintenance_detail_stop_failed">Temporary admin session active for up to %1$d minutes. Lock Task stop failed or was unavailable; kiosk protections remain active where provisioned.</string>
     <string name="action_retry">Retry</string>
+    <string name="action_return_to_system">Return to system</string>
     <string name="action_verify">Verify</string>
     <string name="action_cancel">Cancel</string>
     <string name="admin_pin_hint">PIN</string>

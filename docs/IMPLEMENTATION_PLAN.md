@@ -32,7 +32,7 @@ Each task must end with validation and documentation updates. Status values: pen
 | Task | Objective | Files | Dependencies | Done | Tests | Risks | Status |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | KIOSK-030 | Implement DeviceAdminReceiver | `admin` | Manifest | Receiver registered | Manual/ADB | Confusing admin vs owner | completed initial |
-| KIOSK-031 | Configure Lock Task packages | `KioskController` | Device Owner | App allowlisted | Device test | Requires factory reset | pending |
+| KIOSK-031 | Configure Lock Task packages | `KioskController` | Device Owner | Device Owner app allowlists its own package before Lock Task start | Build/lint validated | Requires real Device Owner validation | completed initial |
 | KIOSK-032 | Show provisioning status | `kiosk`, `ui` | DevicePolicyManager | Device Owner and Lock Task permission are visible when not provisioned | Unit/build validated | Needs real-device validation | completed initial |
 | KIOSK-033 | Add development fallback messaging | `ui` | None | Debug fallback banner clearly says kiosk security is inactive | Unit/build validated | Must not ship as production assurance | completed initial |
 
@@ -42,8 +42,8 @@ Each task must end with validation and documentation updates. Status values: pen
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | KIOSK-040 | Wire hidden gesture | `MainActivity`, `admin` | UI | Hidden tap gesture opens admin challenge state only | Unit tests passed | Gesture must not unlock without PIN | completed initial |
 | KIOSK-041 | Implement secure PIN verifier | `admin`, `security` | PBKDF2 config | PIN verifies against configurable PBKDF2 hash/salt; no repo PIN | Unit tests passed | Needs provisioning/config source before production | completed initial |
-| KIOSK-042 | Maintenance mode screen | `ui`, layout | Admin flow | Timed admin mode | Manual | User escapes too long | pending |
-| KIOSK-043 | Re-enter kiosk | `kiosk`, `admin` | Lock Task | Kiosk restores | Device test | Lock Task failure | pending |
+| KIOSK-042 | Maintenance mode screen | `ui`, layout | Admin flow | Timed admin mode with return action | Build/lint validated | Does not stop Lock Task until KIOSK-043 | completed initial |
+| KIOSK-043 | Re-enter kiosk | `kiosk`, `admin` | Lock Task | PIN-verified maintenance stops Lock Task when possible and restart is attempted on return or timeout | Build/lint validated | Needs real Device Owner validation | completed initial |
 
 ## Phase 5: Resilience
 

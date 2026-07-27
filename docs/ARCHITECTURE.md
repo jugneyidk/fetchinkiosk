@@ -48,7 +48,7 @@ flowchart TD
 | `KioskController` | Start/stop Lock Task only through controlled paths. |
 | `DeviceOwnerStatusProvider` | Read Device Owner and Lock Task permission status. |
 | `AdminAccessController` | Detect hidden gesture only; never authorize by itself. |
-| `AdminPinVerifier` | Future boundary for secure PIN verification. |
+| `AdminPinVerifier` | Verifies admin PIN candidates without storing plain-text PIN values. |
 | `KioskLogger` | Log administrative events without sensitive data. |
 
 ## Data Flow
@@ -89,7 +89,7 @@ Centralized settings planned:
 | Screenshots | `AppConfig.allowScreenshots` | Device config |
 | WebView debugging | Build type | Build type only |
 | Admin gesture | `AppConfig` | Device config |
-| Admin unlock timeout | Planned | Device config |
+| Admin unlock timeout | `BuildConfig.DEFAULT_ADMIN_SESSION_MILLIS` | Device config |
 | User agent suffix | `AppConfig` | Device config |
 
 ## WebView Design
@@ -106,11 +106,11 @@ Centralized settings planned:
 
 ## Kiosk Controller Design
 
-`KioskController` wraps platform APIs. It must expose explicit results instead of swallowing provisioning failures. Full production behavior requires Device Owner and Lock Task allowlisting.
+`KioskController` wraps platform APIs. It allowlists the app package for Lock Task only when the app is Device Owner, then starts Lock Task when permitted. It must expose explicit results instead of swallowing provisioning failures. Full production confidence still requires real Device Owner validation.
 
 ## Administrative Access Design
 
-The hidden gesture only opens a PIN challenge. The gesture is not authorization. The final PIN implementation must use a derived hash with salt, Android Keystore, or remote validation. No real PIN belongs in source code.
+The hidden gesture only opens a PIN challenge. The gesture is not authorization. PIN verification uses configurable PBKDF2 material with empty defaults in the repository. A valid PIN starts a timed maintenance session, attempts controlled Lock Task stop, and attempts Lock Task restart when the session ends. No real PIN belongs in source code.
 
 ## Persistence
 
@@ -118,7 +118,7 @@ No runtime persistence is implemented in the skeleton. DataStore Preferences is 
 
 ## Error Handling
 
-Current error UI exists at state level. Future implementation must distinguish offline, HTTP/TLS failures, blocked navigation, renderer crash, and blank WebView.
+Current error UI distinguishes offline, HTTP/TLS failures, blocked navigation, renderer death recovery, provisioning status, admin challenge, and timed maintenance mode. Blank WebView detection remains future resilience work.
 
 ## Logs
 
