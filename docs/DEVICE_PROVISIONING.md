@@ -61,6 +61,18 @@ Release:
 adb shell monkey -p com.fetchin.kiosk 1
 ```
 
+On first launch, enter the HTTPS URL and administrator PIN. Kiosk mode starts after setup is saved.
+
+## Reset First-Run Setup
+
+During development on an unmanaged install:
+
+```powershell
+adb shell pm clear com.fetchin.kiosk.debug
+```
+
+On a Device Owner device, Android may block normal uninstall/reset flows. Remove Device Owner or factory reset the development tablet if app data cannot be cleared safely.
+
 ## Exit Kiosk During Development
 
 Final admin exit flow is not implemented yet. During development, use ADB only on authorized devices.
@@ -88,6 +100,14 @@ If removal fails, factory reset the development tablet.
 | Device unauthorized | USB prompt not accepted | Reconnect, accept prompt, retry. |
 | Lock Task does not start | App not allowlisted | Implement DevicePolicyManager lock task package setup. |
 
+## Emulator Validation Notes
+
+- A clean emulator can be used for early Device Owner validation.
+- If `set-device-owner` fails because accounts exist, wipe the AVD and retry before adding any account.
+- Debug package component is `com.fetchin.kiosk.debug/com.fetchin.kiosk.admin.KioskDeviceAdminReceiver`.
+- After launching the app, `adb shell dumpsys activity activities` should show `mLockTaskModeState=LOCKED` and `u0:[com.fetchin.kiosk.debug]` under `mLockTaskPackages`.
+- `adb shell input KEYCODE_HOME` is not a physical-user security test because shell-injected input can bypass conditions that normal users cannot.
+
 ## Development Vs Production
 
 | Area | Development | Production |
@@ -96,7 +116,7 @@ If removal fails, factory reset the development tablet.
 | WebView debugging | Allowed | Disabled |
 | Device Owner | Optional for UI work | Required |
 | Reset policy | Frequent factory reset acceptable | Controlled enrollment process |
-| Config | Provisional defaults | Managed, audited values |
+| Config | First-run local setup | Managed, audited values or controlled first-run setup |
 
 ## Updates
 

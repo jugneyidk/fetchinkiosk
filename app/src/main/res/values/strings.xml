@@ -19,6 +19,17 @@
     <string name="state_maintenance">Maintenance mode</string>
     <string name="state_maintenance_detail_stopped">Temporary admin session active for up to %1$d minutes. Lock Task will restart when the session ends.</string>
     <string name="state_maintenance_detail_stop_failed">Temporary admin session active for up to %1$d minutes. Lock Task stop failed or was unavailable; kiosk protections remain active where provisioned.</string>
+    <string name="setup_title">Initial setup</string>
+    <string name="setup_detail">Configure the HTTPS page and administrator PIN before kiosk mode starts. To reset this setup, clear app data or reinstall the app.</string>
+    <string name="setup_start_url_hint">https://example.com</string>
+    <string name="setup_pin_hint">Administrator PIN</string>
+    <string name="setup_pin_confirm_hint">Confirm administrator PIN</string>
+    <string name="setup_save">Start kiosk</string>
+    <string name="setup_error_invalid_url">Enter a valid HTTPS URL.</string>
+    <string name="setup_error_non_https_url">Only HTTPS URLs are allowed.</string>
+    <string name="setup_error_missing_host">The URL must include a host name.</string>
+    <string name="setup_error_empty_pin">Enter an administrator PIN.</string>
+    <string name="setup_error_pin_mismatch">PIN confirmation does not match.</string>
     <string name="action_retry">Retry</string>
     <string name="action_return_to_system">Return to system</string>
     <string name="action_verify">Verify</string>

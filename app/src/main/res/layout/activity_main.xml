@@ -22,6 +22,94 @@
         android:visibility="gone"
         tools:text="Development fallback" />
 
+    <ScrollView
+        android:id="@+id/setupPanel"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true"
+        android:visibility="gone">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:orientation="vertical"
+            android:padding="32dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="@string/setup_title"
+                android:textColor="@color/kiosk_on_background"
+                android:textSize="24sp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:gravity="center"
+                android:text="@string/setup_detail"
+                android:textColor="@color/kiosk_on_background"
+                android:textSize="16sp" />
+
+            <EditText
+                android:id="@+id/setupStartUrlInput"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:autofillHints="url"
+                android:hint="@string/setup_start_url_hint"
+                android:inputType="textUri"
+                android:singleLine="true"
+                android:textColor="@color/kiosk_on_background"
+                android:textColorHint="#B8C2CC" />
+
+            <EditText
+                android:id="@+id/setupPinInput"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:autofillHints="password"
+                android:hint="@string/setup_pin_hint"
+                android:inputType="numberPassword"
+                android:singleLine="true"
+                android:textColor="@color/kiosk_on_background"
+                android:textColorHint="#B8C2CC" />
+
+            <EditText
+                android:id="@+id/setupPinConfirmInput"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:autofillHints="password"
+                android:hint="@string/setup_pin_confirm_hint"
+                android:inputType="numberPassword"
+                android:singleLine="true"
+                android:textColor="@color/kiosk_on_background"
+                android:textColorHint="#B8C2CC" />
+
+            <TextView
+                android:id="@+id/setupError"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:gravity="center"
+                android:textColor="@color/kiosk_warning"
+                android:textSize="14sp"
+                android:visibility="gone"
+                tools:text="Setup error" />
+
+            <Button
+                android:id="@+id/setupSaveButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="24dp"
+                android:text="@string/setup_save" />
+        </LinearLayout>
+    </ScrollView>
+
     <LinearLayout
         android:id="@+id/statusPanel"
         android:layout_width="match_parent"

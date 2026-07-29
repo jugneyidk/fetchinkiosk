@@ -14,6 +14,9 @@ import androidx.appcompat.app.AppCompatActivity
 import com.fetchin.kiosk.admin.AdminAccessController
 import com.fetchin.kiosk.admin.AdminPinVerifier
 import com.fetchin.kiosk.config.AppConfig
+import com.fetchin.kiosk.config.InitialSetupConfigBuilder
+import com.fetchin.kiosk.config.InitialSetupResult
+import com.fetchin.kiosk.config.LocalAppConfigRepository
 import com.fetchin.kiosk.databinding.ActivityMainBinding
 import com.fetchin.kiosk.kiosk.KioskController
 import com.fetchin.kiosk.kiosk.KioskProvisioningStatus
@@ -29,6 +32,7 @@ import com.fetchin.kiosk.web.WebViewConfigurator
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var config: AppConfig
+    private lateinit var configRepository: LocalAppConfigRepository
     private lateinit var kioskController: KioskController
     private lateinit var connectivityObserver: ConnectivityObserver
     private lateinit var adminAccessController: AdminAccessController
@@ -45,17 +49,19 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
         currentWebView = binding.kioskWebView
 
-        config = AppConfig.default()
+        configRepository = LocalAppConfigRepository(this)
         kioskController = KioskController(this)
         connectivityObserver = AndroidConnectivityObserver(this)
-        adminAccessController = AdminAccessController(config.adminGestureTapCount, config.adminGestureWindowMillis)
-        adminPinVerifier = config.adminPinVerifier()
 
         applyScreenPolicy()
         configureBackBehavior()
-        configureWebView()
-        configureAdminGesture()
-        handleKioskStart(kioskController.startLockTaskIfAllowed())
+        configureInitialSetup()
+        val storedConfig = configRepository.load()
+        if (storedConfig == null) {
+            showInitialSetup()
+        } else {
+            startKiosk(storedConfig)
+        }
     }
 
     override fun onResume() {
@@ -70,9 +76,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun applyScreenPolicy() {
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-        if (!config.allowScreenshots) {
-            window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
-        }
+        window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
         enterImmersiveMode()
     }
 
@@ -92,7 +96,9 @@ class MainActivity : AppCompatActivity() {
             this,
             object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
-                    if (currentUiState is KioskUiState.Maintenance) {
+                    if (binding.setupPanel.visibility == View.VISIBLE) {
+                        return
+                    } else if (currentUiState is KioskUiState.Maintenance) {
                         endMaintenanceMode()
                     } else if (currentWebView.canGoBack()) {
                         currentWebView.goBack()
@@ -102,6 +108,62 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         )
+    }
+
+    private fun configureInitialSetup() {
+        binding.setupSaveButton.setOnClickListener {
+            saveInitialSetup()
+        }
+    }
+
+    private fun showInitialSetup() {
+        binding.setupPanel.visibility = View.VISIBLE
+        binding.kioskWebView.visibility = View.GONE
+        binding.statusPanel.visibility = View.GONE
+        binding.provisioningBanner.visibility = View.GONE
+        binding.adminGestureTarget.visibility = View.GONE
+    }
+
+    private fun saveInitialSetup() {
+        val result = InitialSetupConfigBuilder.default().build(
+            startUrlInput = binding.setupStartUrlInput.text?.toString().orEmpty(),
+            pin = editableToCharArray(binding.setupPinInput.text),
+            pinConfirmation = editableToCharArray(binding.setupPinConfirmInput.text)
+        )
+        binding.setupPinInput.text?.clear()
+        binding.setupPinConfirmInput.text?.clear()
+        when (result) {
+            is InitialSetupResult.Success -> {
+                configRepository.save(result.config)
+                binding.setupError.visibility = View.GONE
+                startKiosk(result.config)
+            }
+            else -> showInitialSetupError(result)
+        }
+    }
+
+    private fun showInitialSetupError(result: InitialSetupResult) {
+        binding.setupError.text = when (result) {
+            InitialSetupResult.InvalidUrl -> getString(R.string.setup_error_invalid_url)
+            InitialSetupResult.NonHttpsUrl -> getString(R.string.setup_error_non_https_url)
+            InitialSetupResult.MissingHost -> getString(R.string.setup_error_missing_host)
+            InitialSetupResult.EmptyPin -> getString(R.string.setup_error_empty_pin)
+            InitialSetupResult.PinMismatch -> getString(R.string.setup_error_pin_mismatch)
+            is InitialSetupResult.Success -> ""
+        }
+        binding.setupError.visibility = View.VISIBLE
+    }
+
+    private fun startKiosk(storedConfig: AppConfig) {
+        config = storedConfig
+        adminAccessController = AdminAccessController(config.adminGestureTapCount, config.adminGestureWindowMillis)
+        adminPinVerifier = config.adminPinVerifier()
+        binding.setupPanel.visibility = View.GONE
+        binding.kioskWebView.visibility = View.VISIBLE
+        binding.adminGestureTarget.visibility = View.VISIBLE
+        configureWebView()
+        configureAdminGesture()
+        handleKioskStart(kioskController.startLockTaskIfAllowed())
     }
 
     private fun configureWebView() {
@@ -251,6 +313,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun render(state: KioskUiState) {
         currentUiState = state
+        binding.setupPanel.visibility = View.GONE
         binding.statusPanel.visibility = when (state) {
             KioskUiState.WebContent -> View.GONE
             else -> View.VISIBLE

@@ -46,7 +46,7 @@ Fetchin Kiosk security depends on native controls plus managed provisioning. A W
 | Page opens popup | Disable multiple windows and automatic windows. |
 | File exfiltration through WebView | Disable file/content access. |
 | Mixed-content downgrade | Block mixed content. |
-| PIN extracted from APK | No plain PIN in code; use derived hash/Keystore/remote validation. |
+| PIN extracted from APK | No plain PIN or production URL in code; first-run setup stores PBKDF2 material in private app data. |
 | Logs leak secrets | Log event types only, no sensitive values. |
 | Screenshot leaks internal data | `FLAG_SECURE` by default. |
 | Device reboot exits kiosk | Boot behavior and launcher policy must be implemented in later phase. |
@@ -55,13 +55,7 @@ Fetchin Kiosk security depends on native controls plus managed provisioning. A W
 
 ## Allowed Domains
 
-Provisional allowlist:
-
-- `pos.example.com`
-- `api.pos.example.com`
-- `sub.pos.example.com`
-
-Final domains must be supplied by project owner before production.
+The first-run HTTPS URL defines the initial allowed host. `UrlPolicy` allows that host and true subdomains separated by a dot. Extra sibling domains require future configuration support.
 
 ## Allowed Schemes
 
@@ -143,9 +137,9 @@ Forbidden:
 
 - No real PIN in source code.
 - No plain-text PIN in preferences.
-- Current implementation supports PBKDF2 with Base64 hash and salt configuration.
-- Default repository configuration is intentionally empty, so no PIN can verify out of the box.
-- Production must provide hash/salt through an approved provisioning/configuration path.
+- First-run setup derives PBKDF2 hash and salt material from the administrator PIN.
+- Default repository configuration contains no usable PIN.
+- Private app storage holds PBKDF2 material; it is not a substitute for strong PINs, rate limiting, or managed provisioning.
 - Android Keystore or remote validation remains recommended for production hardening.
 - Gesture alone must never unlock kiosk.
 - Admin maintenance attempts are logged by event type only, without PIN values or sensitive session data.

@@ -4,7 +4,7 @@ Fetchin Kiosk is a native Android kiosk shell that will turn a tablet into a ded
 
 ## Current Status
 
-Foundation stage. The repository contains a minimal Android project, XML-based UI shell, WebView security skeleton, URL allowlist tests, and architecture/security documentation. Full kiosk behavior is not implemented yet.
+Foundation stage. The repository contains a native Android kiosk shell with first-run setup, WebView URL policy, admin PIN verification, Device Owner/Lock Task support, tests, and architecture/security documentation.
 
 ## Problem Solved
 
@@ -71,13 +71,23 @@ gradle assembleDebug
 adb install -r app\build\outputs\apk\debug\app-debug.apk
 ```
 
+## First Run Setup
+
+On first launch, the app asks for:
+
+- HTTPS page URL.
+- Administrator PIN.
+- PIN confirmation.
+
+The URL is stored in private app data. The PIN is never stored as plain text; the app stores PBKDF2 hash and salt material. Kiosk mode starts only after setup is saved.
+
+To reset setup during development, clear app data or reinstall the APK. If the app is already Device Owner on a managed tablet, Android may require removing Device Owner or factory resetting the device before uninstalling.
+
 ## Limitations Now
 
-- Lock Task allowlisting is not configured yet.
-- Admin PIN verification uses configurable PBKDF2 material, but production config source is not selected.
+- First-run setup supports one configured URL host; extra sibling domains need future configuration UI if a web app needs them.
 - Controlled Lock Task exit/re-entry needs real Device Owner hardware validation.
 - WebView renderer recovery needs real tablet validation.
-- Device configuration is currently compile-time defaults only.
 - No remote configuration, MDM, QR provisioning, printing, camera, downloads, or file uploads.
 
 ## Internal Docs

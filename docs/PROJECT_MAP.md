@@ -80,8 +80,10 @@ This file is the navigable map for Fetchin Kiosk. Keep it synchronized with real
 
 | Class | Status | Responsibility |
 | --- | --- | --- |
-| `MainActivity` | Skeleton | Coordinates UI, WebView setup, back handling, immersive mode. |
-| `AppConfig` | Skeleton | Centralizes provisional start URL, hosts, flags, and admin gesture values. |
+| `MainActivity` | Implemented initial | Coordinates first-run setup, UI, WebView setup, back handling, immersive mode, and kiosk lifecycle. |
+| `AppConfig` | Implemented initial | Carries runtime start URL, allowed host, flags, and admin gesture values. |
+| `InitialSetupConfigBuilder` | Implemented initial | Validates HTTPS URL/PIN setup and derives PBKDF2 PIN material. |
+| `LocalAppConfigRepository` | Implemented initial | Persists first-run configuration in private app preferences. |
 | `UrlPolicy` | Implemented | Validates HTTPS and allowlisted host boundaries, returning allow/block reasons. |
 | `WebViewConfigurator` | Skeleton | Applies initial secure WebView settings. |
 | `SecureWebViewClient` | Implemented initial | Blocks disallowed navigation, returns 403 for disallowed subresources, reports main-frame load errors, and handles renderer death. |
@@ -109,11 +111,15 @@ sequenceDiagram
     participant WebView
     participant KioskController
     Android->>MainActivity: launch
-    MainActivity->>AppConfig: load provisional defaults
+    MainActivity->>AppConfig: load stored setup
+    alt no setup
+        MainActivity->>MainActivity: show initial setup
+    else setup exists
     MainActivity->>MainActivity: apply immersive and screen policy
     MainActivity->>WebViewConfigurator: configure WebView
     MainActivity->>WebView: load start URL
     MainActivity->>KioskController: startLockTaskIfAllowed
+    end
 ```
 
 ## WebView Flow
@@ -154,9 +160,9 @@ security -> Android Log only for now
 
 ## Configuration Location
 
-- Compile-time defaults: `app/build.gradle.kts` BuildConfig fields.
 - Runtime wrapper: `AppConfig`.
-- Future device-local configuration: planned DataStore or managed configuration.
+- First-run persistence: `LocalAppConfigRepository` with private `SharedPreferences`.
+- Compile-time defaults: non-secret admin derivation parameters and debug flags in `app/build.gradle.kts`.
 - Future remote configuration: out of MVP.
 
 ## Tests Location

@@ -19,15 +19,16 @@ Fetchin Kiosk is a native Android kiosk shell for tablets. It loads one authoriz
 - Provisioning status is visible when Lock Task is not permitted.
 - Debug builds show a visible weaker-security fallback banner instead of silently pretending to be production kiosk mode.
 - Connectivity is checked before initial load and retry using Android validated internet capability.
+- Missing local configuration shows first-run setup and does not start Lock Task.
 - Main-frame WebView network, HTTP, and TLS errors show custom error states.
 - WebView renderer death recreates the WebView and shows a recoverable error state.
 - Hidden admin gesture opens an admin challenge state only; it does not unlock kiosk or stop Lock Task.
-- Admin PIN verification uses configurable PBKDF2 hash/salt material and no plain-text PIN in the repository.
+- Admin PIN verification uses first-run PBKDF2 hash/salt material and no plain-text PIN in the repository.
 - Valid admin PIN enters a timed maintenance state, attempts controlled Lock Task stop, and attempts Lock Task restart on return or timeout.
 - Device admin receiver exists.
 - Kiosk controller allowlists its own package when Device Owner and then starts Lock Task when permitted.
-- Admin PIN verification boundary is implemented with empty default verification material.
-- Device-local config and provisioning logic are not implemented.
+- `Pixel_7a` emulator validation passed for debug Device Owner provisioning and Lock Task startup after wiping AVD data.
+- Device-local first-run URL and PIN configuration is implemented with private app storage.
 
 ## Finished
 
@@ -44,7 +45,7 @@ Fetchin Kiosk is a native Android kiosk shell for tablets. It loads one authoriz
 
 ## Not Implemented
 
-- Production source for admin PIN hash/salt configuration.
+- Extra allowed-host setup for sibling API/CDN domains.
 - Real-device Device Owner and Lock Task validation.
 - Manual validation of renderer crash recovery on target tablets.
 - DataStore or managed config.
@@ -83,8 +84,9 @@ Fetchin Kiosk is a native Android kiosk shell for tablets. It loads one authoriz
 - SDK initially had only `android-36.1`; validation installed clean `android-36` after repairing an incomplete concurrent install.
 - Real tablet model is unknown.
 - Production URL and domains are unknown.
-- PIN strategy is not selected.
+- First-run PIN reset on Device Owner devices may require removing Device Owner or factory reset.
 - Device Owner setup needs factory-reset device.
+- Emulator shell input can bypass Lock Task, so use physical controls on real hardware for final user-exit validation.
 
 ## Key Files
 

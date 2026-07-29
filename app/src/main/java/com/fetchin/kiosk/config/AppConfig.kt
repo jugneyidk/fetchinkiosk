@@ -23,12 +23,8 @@ data class AppConfig(
 
     companion object {
         fun default(): AppConfig = AppConfig(
-            startUrl = BuildConfig.DEFAULT_START_URL,
-            allowedHosts = BuildConfig.DEFAULT_ALLOWED_HOSTS
-                .split(',')
-                .map { it.trim().lowercase() }
-                .filter { it.isNotBlank() }
-                .toSet(),
+            startUrl = "",
+            allowedHosts = emptySet(),
             allowScreenshots = false,
             webViewDebugging = BuildConfig.WEBVIEW_DEBUGGING,
             adminGestureTapCount = 7,
@@ -42,5 +38,14 @@ data class AppConfig(
             adminSessionMillis = BuildConfig.DEFAULT_ADMIN_SESSION_MILLIS,
             userAgentSuffix = null
         )
+
+        fun local(startUrl: String, allowedHosts: Set<String>, adminPinConfig: AdminPinConfig): AppConfig {
+            val defaults = default()
+            return defaults.copy(
+                startUrl = startUrl,
+                allowedHosts = allowedHosts,
+                adminPinConfig = adminPinConfig
+            )
+        }
     }
 }

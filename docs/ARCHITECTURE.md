@@ -32,6 +32,8 @@ flowchart TD
     DeviceOwnerStatusProvider --> DevicePolicyManager
     MainActivity --> AdminAccessController
     AdminAccessController --> AdminPinVerifier
+    MainActivity --> LocalAppConfigRepository
+    InitialSetupConfigBuilder --> AppConfig
     MainActivity --> KioskUiState
     KioskLogger --> AndroidLog
 ```
@@ -41,7 +43,9 @@ flowchart TD
 | Component | Responsibility |
 | --- | --- |
 | `MainActivity` | Coordinate lifecycle, bind UI, delegate security decisions. |
-| `AppConfig` | Centralize provisional defaults and construct policies. |
+| `AppConfig` | Carry runtime kiosk configuration and construct policies. |
+| `LocalAppConfigRepository` | Load and save first-run configuration in private app storage. |
+| `InitialSetupConfigBuilder` | Validate first-run URL/PIN input and produce runtime configuration. |
 | `UrlPolicy` | Decide whether a URL may load. |
 | `WebViewConfigurator` | Apply WebView security settings. |
 | `SecureWebViewClient` | Route navigation through policy and report load state. |
@@ -54,15 +58,16 @@ flowchart TD
 ## Data Flow
 
 ```text
-BuildConfig defaults -> AppConfig -> UrlPolicy/WebViewConfigurator/MainActivity -> WebView/KioskController
+First-run setup -> LocalAppConfigRepository -> AppConfig -> UrlPolicy/WebViewConfigurator/MainActivity -> WebView/KioskController
 ```
 
-Future device configuration must flow through `AppConfig`; no component should read ad hoc preference keys.
+Device configuration flows through `AppConfig`; only `LocalAppConfigRepository` reads preference keys.
 
 ## Activity Lifecycle
 
 - `onCreate` inflates ViewBinding.
-- Configuration is loaded once from defaults in the skeleton.
+- Configuration is loaded from private app storage.
+- Missing configuration shows first-run setup and does not start Lock Task.
 - Screen policy and immersive mode are applied.
 - Back behavior is intercepted.
 - WebView is configured and initial URL loaded.
@@ -83,8 +88,8 @@ Centralized settings planned:
 
 | Setting | Current Source | Future Source |
 | --- | --- | --- |
-| Start URL | `BuildConfig.DEFAULT_START_URL` | Device-local or managed config |
-| Allowed hosts | `BuildConfig.DEFAULT_ALLOWED_HOSTS` | Managed config |
+| Start URL | First-run setup stored in private app data | Managed config optional later |
+| Allowed host | Host from first-run setup URL | Extra host configuration optional later |
 | Orientation | Manifest landscape | Device config if required |
 | Screenshots | `AppConfig.allowScreenshots` | Device config |
 | WebView debugging | Build type | Build type only |
@@ -110,11 +115,11 @@ Centralized settings planned:
 
 ## Administrative Access Design
 
-The hidden gesture only opens a PIN challenge. The gesture is not authorization. PIN verification uses configurable PBKDF2 material with empty defaults in the repository. A valid PIN starts a timed maintenance session, attempts controlled Lock Task stop, and attempts Lock Task restart when the session ends. No real PIN belongs in source code.
+The hidden gesture only opens a PIN challenge. The gesture is not authorization. PIN verification uses PBKDF2 material created during first-run setup. A valid PIN starts a timed maintenance session, attempts controlled Lock Task stop, and attempts Lock Task restart when the session ends. No real PIN belongs in source code.
 
 ## Persistence
 
-No runtime persistence is implemented in the skeleton. DataStore Preferences is acceptable when device-local configuration is implemented.
+First-run setup is persisted in private `SharedPreferences`. The administrator PIN is stored as PBKDF2 hash and salt material, not plain text. Clearing app data or reinstalling resets setup on unmanaged devices; Device Owner devices may require removing Device Owner or factory reset first.
 
 ## Error Handling
 
@@ -154,12 +159,16 @@ sequenceDiagram
     participant W as WebViewConfigurator
     participant V as WebView
     participant K as KioskController
-    A->>C: default()
+    A->>C: load stored config
+    alt missing config
+        A->>A: show first-run setup
+    else config exists
     A->>A: applyScreenPolicy()
     A->>A: configureBackBehavior()
     A->>W: configure(webView)
     A->>V: loadUrl(startUrl)
     A->>K: startLockTaskIfAllowed()
+    end
 ```
 
 ## Lock Task Entry Sequence

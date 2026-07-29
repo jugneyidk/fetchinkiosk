@@ -14,8 +14,6 @@ android {
         versionName = "0.1.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
-        buildConfigField("String", "DEFAULT_START_URL", "\"https://pos.example.com\"")
-        buildConfigField("String", "DEFAULT_ALLOWED_HOSTS", "\"pos.example.com,api.pos.example.com,sub.pos.example.com\"")
         buildConfigField("String", "DEFAULT_ADMIN_PIN_HASH_BASE64", "\"\"")
         buildConfigField("String", "DEFAULT_ADMIN_PIN_SALT_BASE64", "\"\"")
         buildConfigField("int", "DEFAULT_ADMIN_PIN_ITERATIONS", "210000")

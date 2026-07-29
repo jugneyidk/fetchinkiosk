@@ -8,12 +8,14 @@ Criteria are binary. Each item is pass/fail.
 - Unit tests run with documented command.
 - Lint runs with documented command or failure is documented.
 - No secrets are committed.
+- First-run setup collects URL and administrator PIN when no local configuration exists.
 - `PROJECT_MAP.md` matches real structure.
 - `PROJECT_STATUS.md` shows real validation results.
 
 ## WebView
 
 - App opens configured start URL.
+- Configured URL is not hardcoded as a production value in source.
 - Only allowed HTTPS hosts load.
 - `https://pos.example.com` is allowed.
 - `https://sub.pos.example.com` is allowed when base host is allowed.
@@ -55,6 +57,7 @@ Criteria are binary. Each item is pass/fail.
 - Hidden gesture alone cannot exit kiosk.
 - Incorrect PIN cannot disable kiosk.
 - PIN is not stored as plain text.
+- Forgetting the PIN requires clearing app data, reinstalling, or factory reset/removing Device Owner on managed devices.
 - Admin exit is temporary and logged safely.
 
 ## Security

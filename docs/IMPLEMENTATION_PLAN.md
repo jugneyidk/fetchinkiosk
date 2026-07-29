@@ -52,7 +52,7 @@ Each task must end with validation and documentation updates. Status values: pen
 | KIOSK-050 | Connectivity observer | `util`, `ui` | ConnectivityManager | Offline state checks validated internet before loading/retry | Build/lint validated | Captive portals may appear offline by design | completed initial |
 | KIOSK-051 | WebView error handling | `web`, `ui` | WebViewClient callbacks | Main-frame network, HTTP, and TLS errors show custom error state | Build/lint validated | Needs instrumented WebView tests | completed initial |
 | KIOSK-052 | Renderer crash recovery | `web` | API support | Renderer death recreates WebView and shows recoverable error | Build/lint validated | Needs manual renderer crash test on device | completed initial |
-| KIOSK-053 | Minimal persistence | `config` | DataStore if needed | Config survives reboot | Unit/manual | Local tampering | pending |
+| KIOSK-053 | Minimal persistence | `config` | SharedPreferences | First-run URL and PBKDF2 PIN material survive reboot | Unit tests passed | Local app data reset clears setup | completed initial |
 
 ## Phase 6: Provisioning
 
