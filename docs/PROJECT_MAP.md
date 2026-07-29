@@ -35,6 +35,7 @@ This file is the navigable map for Fetchin Kiosk. Keep it synchronized with real
     ├── OPEN_QUESTIONS.md
     ├── PROJECT_MAP.md
     ├── PROJECT_STATUS.md
+    ├── RELEASE_GUIDE.md
     ├── REVIEW_CHECKLIST.md
     ├── ROADMAP.md
     └── SECURITY_MODEL.md
@@ -169,3 +170,8 @@ security -> Android Log only for now
 
 - Unit tests: `app/src/test/java/`.
 - Instrumented tests: `app/src/androidTest/java/`, currently empty.
+
+## Release Docs
+
+- `README.md` is the public project entry point.
+- `docs/RELEASE_GUIDE.md` describes APK release preparation and release-note structure.

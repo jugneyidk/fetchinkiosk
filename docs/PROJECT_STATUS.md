@@ -3,9 +3,9 @@
 | Field | Value |
 | --- | --- |
 | Updated | 2026-07-22 |
-| Stage | First-run setup implementation complete |
-| Last change | Added local first-run URL and administrator PIN setup for public APK use |
-| Next task | Manually verify setup save on emulator/device, then commit if approved |
+| Stage | Public README and release guide drafted |
+| Last change | Rewrote README for public use and added APK release preparation guide |
+| Next task | Review README/release guide, then commit docs if approved |
 | Build status | Passing: `assembleDebug` |
 | Test status | Passing: `testDebugUnitTest`, 25 tests |
 | Lint status | Passing: `lintDebug` |
