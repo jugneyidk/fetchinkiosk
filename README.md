@@ -1,5 +1,9 @@
 # Fetchin Kiosk
 
+<p align="center">
+  <img src="logofetchinkiosk.png" alt="Fetchin Kiosk logo" width="160" />
+</p>
+
 Fetchin Kiosk turns an Android tablet into a dedicated WebView kiosk for one HTTPS web system. It is built for public APK distribution: each installation configures its own page URL and administrator PIN on first launch, so the repository does not ship with a production URL, password, token, or secret.
 
 ## What It Does
