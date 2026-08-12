@@ -32,6 +32,7 @@ Fetchin Kiosk is a native Android kiosk shell for tablets. It loads one authoriz
 - Public README and APK release preparation guide are drafted.
 - Release signing reads ignored local `keystore.properties` when present.
 - Local `release-key.jks` and `keystore.properties` exist on this workstation and produced signed `app-release.apk`.
+- GitHub release `v0.1.0` is published with a signed APK asset.
 
 ## Finished
 

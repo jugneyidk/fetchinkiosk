@@ -3,9 +3,9 @@
 | Field | Value |
 | --- | --- |
 | Updated | 2026-08-10 |
-| Stage | Local release signing configuration added |
-| Last change | Generated local release keystore and built signed release APK |
-| Next task | Commit release signing setup, then publish GitHub release if approved |
+| Stage | GitHub release published |
+| Last change | Published signed APK release `v0.1.0` |
+| Next task | Validate signed release APK on real target tablet |
 | Build status | Passing: `assembleDebug`, `assembleRelease` signed with local keystore |
 | Test status | Passing: `testDebugUnitTest`, 25 tests |
 | Lint status | Passing: `lintDebug` |
@@ -45,6 +45,7 @@
 - `.\gradlew.bat testDebugUnitTest --console=plain` passed in 5s after release signing changes.
 - `.\gradlew.bat assembleDebug --console=plain` passed in 4s after release signing changes.
 - `.\gradlew.bat lintDebug --console=plain` passed in 40s after release signing changes.
+- GitHub release `v0.1.0` published at `https://github.com/jugneyidk/fetchinkiosk/releases/tag/v0.1.0` with signed APK asset.
 - `UrlPolicyTest` ran 13 tests, 0 failures, 0 errors.
 - `AdminAccessControllerTest` ran 3 tests, 0 failures, 0 errors.
 - `Pbkdf2AdminPinVerifierTest` ran 4 tests, 0 failures, 0 errors.
@@ -87,6 +88,7 @@
 
 - `local.properties` was created for this workstation with the SDK path and is ignored by `.gitignore`.
 - `release-key.jks` and `keystore.properties` were created locally in the repository root and are ignored by `.gitignore`.
+- The first generated local keystore was rotated before release because its password was accidentally printed during a local secret-scan command over ignored files.
 - The incomplete SDK folder `platforms/android-36` was moved out of the SDK to `C:\Users\tokyo\AppData\Local\Temp\opencode\android-36.corrupt-20260712_194727` before AGP reinstalled `android-36` cleanly.
 - Future Gradle validation should run sequentially, not in parallel, when SDK components may be installed.
 - After wiping `Pixel_7a`, the first emulator boot temporarily appeared `offline` in ADB; killing the stuck emulator/QEMU process and relaunching with `-no-snapshot-load` recovered it.
