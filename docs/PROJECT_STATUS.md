@@ -2,11 +2,11 @@
 
 | Field | Value |
 | --- | --- |
-| Updated | 2026-07-22 |
-| Stage | Public README and release guide drafted |
-| Last change | Rewrote README for public use and added APK release preparation guide |
-| Next task | Review README/release guide, then commit docs if approved |
-| Build status | Passing: `assembleDebug` |
+| Updated | 2026-08-10 |
+| Stage | Local release signing configuration added |
+| Last change | Generated local release keystore and built signed release APK |
+| Next task | Commit release signing setup, then publish GitHub release if approved |
+| Build status | Passing: `assembleDebug`, `assembleRelease` signed with local keystore |
 | Test status | Passing: `testDebugUnitTest`, 25 tests |
 | Lint status | Passing: `lintDebug` |
 
@@ -40,9 +40,11 @@
 
 ## Commands Passing
 
-- `.\gradlew.bat testDebugUnitTest --console=plain` passed in 53s after first-run setup changes.
-- `.\gradlew.bat assembleDebug --console=plain` passed in 8s after first-run setup changes.
-- `.\gradlew.bat lintDebug --console=plain` passed in 46s after first-run setup changes.
+- `.\gradlew.bat assembleRelease --console=plain` passed in 3m21s without local `keystore.properties` and produced `app-release-unsigned.apk`.
+- `.\gradlew.bat assembleRelease --console=plain` passed in 35s with local `keystore.properties` and produced signed `app-release.apk`.
+- `.\gradlew.bat testDebugUnitTest --console=plain` passed in 5s after release signing changes.
+- `.\gradlew.bat assembleDebug --console=plain` passed in 4s after release signing changes.
+- `.\gradlew.bat lintDebug --console=plain` passed in 40s after release signing changes.
 - `UrlPolicyTest` ran 13 tests, 0 failures, 0 errors.
 - `AdminAccessControllerTest` ran 3 tests, 0 failures, 0 errors.
 - `Pbkdf2AdminPinVerifierTest` ran 4 tests, 0 failures, 0 errors.
@@ -84,6 +86,7 @@
 ## Local Repair Notes
 
 - `local.properties` was created for this workstation with the SDK path and is ignored by `.gitignore`.
+- `release-key.jks` and `keystore.properties` were created locally in the repository root and are ignored by `.gitignore`.
 - The incomplete SDK folder `platforms/android-36` was moved out of the SDK to `C:\Users\tokyo\AppData\Local\Temp\opencode\android-36.corrupt-20260712_194727` before AGP reinstalled `android-36` cleanly.
 - Future Gradle validation should run sequentially, not in parallel, when SDK components may be installed.
 - After wiping `Pixel_7a`, the first emulator boot temporarily appeared `offline` in ADB; killing the stuck emulator/QEMU process and relaunching with `-no-snapshot-load` recovered it.

@@ -28,7 +28,7 @@ Fetchin Kiosk is an MVP-stage native Android app. The core WebView policy, first
 | Try the app without kiosk security | Install APK, launch app, complete first-run setup. |
 | Test real kiosk behavior in emulator | Wipe AVD, install APK, set Device Owner, launch app, verify Lock Task. |
 | Build from source | Run `assembleDebug`, install `app-debug.apk`, then complete setup. |
-| Prepare public release | Follow `docs/RELEASE_GUIDE.md`; do not claim production security without real tablet validation. |
+| Prepare public release | Create local signing files, build release APK, then follow `docs/RELEASE_GUIDE.md`. |
 
 ## Security In One Minute
 
@@ -189,7 +189,7 @@ Detailed docs:
 - Real target tablet validation is still required.
 - WebView renderer recovery needs real tablet validation.
 - No MDM/EMM, QR provisioning, printing, camera, downloads, or file uploads yet.
-- Release signing and GitHub APK publishing are not configured yet.
+- GitHub APK publishing is not configured yet.
 
 ## Contributing
 

@@ -11,6 +11,7 @@ This file is the navigable map for Fetchin Kiosk. Keep it synchronized with real
 ├── build.gradle.kts
 ├── settings.gradle.kts
 ├── gradle.properties
+├── keystore.properties.example
 ├── logofetchinkiosk.png
 ├── gradlew
 ├── gradlew.bat
@@ -48,6 +49,7 @@ This file is the navigable map for Fetchin Kiosk. Keep it synchronized with real
 | --- | --- |
 | `AGENTS.md` | Binding rules for future agents. |
 | `README.md` | Human entry point. |
+| `keystore.properties.example` | Template for local release signing configuration without secrets. |
 | `logofetchinkiosk.png` | Public logo used by the README. |
 | `settings.gradle.kts` | Gradle plugin repositories and included modules. |
 | `build.gradle.kts` | Root Gradle plugin declarations. |
@@ -166,6 +168,7 @@ security -> Android Log only for now
 - Runtime wrapper: `AppConfig`.
 - First-run persistence: `LocalAppConfigRepository` with private `SharedPreferences`.
 - Compile-time defaults: non-secret admin derivation parameters and debug flags in `app/build.gradle.kts`.
+- Release signing: local `keystore.properties`, ignored by Git, based on `keystore.properties.example`.
 - Future remote configuration: out of MVP.
 
 ## Tests Location

@@ -30,6 +30,8 @@ Fetchin Kiosk is a native Android kiosk shell for tablets. It loads one authoriz
 - `Pixel_7a` emulator validation passed for debug Device Owner provisioning and Lock Task startup after wiping AVD data.
 - Device-local first-run URL and PIN configuration is implemented with private app storage.
 - Public README and APK release preparation guide are drafted.
+- Release signing reads ignored local `keystore.properties` when present.
+- Local `release-key.jks` and `keystore.properties` exist on this workstation and produced signed `app-release.apk`.
 
 ## Finished
 
@@ -100,6 +102,7 @@ Fetchin Kiosk is a native Android kiosk shell for tablets. It loads one authoriz
 - `app/src/main/java/com/fetchin/kiosk/admin/AdminPinVerifier.kt`
 - `app/src/test/java/com/fetchin/kiosk/web/UrlPolicyTest.kt`
 - `docs/RELEASE_GUIDE.md`
+- `keystore.properties.example`
 
 ## Commands
 

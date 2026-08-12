@@ -28,15 +28,40 @@ Debug APKs are useful for development releases only. They include WebView debugg
 
 ## Build Release APK
 
-Release signing is not configured yet. When it is added, signing secrets must stay outside the repository.
+Release signing is configured through a local `keystore.properties` file. This file is ignored by Git and must never be committed.
 
-Expected future command:
+## Create A Local Signing Key
+
+Generate a local keystore outside version control:
+
+```powershell
+keytool -genkeypair -v -keystore release-key.jks -alias fetchin-kiosk -keyalg RSA -keysize 2048 -validity 10000
+```
+
+Copy the example file:
+
+```powershell
+Copy-Item keystore.properties.example keystore.properties
+```
+
+Edit `keystore.properties` locally:
+
+```properties
+storeFile=release-key.jks
+storePassword=your-keystore-password
+keyAlias=fetchin-kiosk
+keyPassword=your-key-password
+```
+
+Do not commit `keystore.properties` or `*.jks` files.
+
+Build the release APK:
 
 ```powershell
 .\gradlew.bat assembleRelease --console=plain
 ```
 
-Expected future APK path:
+Signed release APK path when `keystore.properties` exists:
 
 ```text
 app\build\outputs\apk\release\app-release.apk
